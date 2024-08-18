@@ -13,7 +13,6 @@ on:
         - keyball61
         - keyball46
         - one47
-        - nozma
       keymap:
         description: 'Keymap'
         required: true

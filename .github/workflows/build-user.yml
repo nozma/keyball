@@ -8,8 +8,8 @@ on:
         required: true
         type: choice
         options:
-        - keyball39
         - keyball44
+        - keyball39
         - keyball61
         - keyball46
         - one47

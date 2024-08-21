@@ -208,12 +208,12 @@ void change_page(bool pressed) {
 // OLEDメイン処理(メイン側)
 void keyball_oled_render_mymain(void) {
     switch(page_no % 2) {
-        case 1:  render_status(); break;
-        default: render_version();  break;
+        case 1:  render_version(); break;
+        default: render_default();  break;
     }
 }
 
 // OLEDメイン処理(サブ側)
 void keyball_oled_render_mysub(void) {
-    render_default();
+    render_status();
 }

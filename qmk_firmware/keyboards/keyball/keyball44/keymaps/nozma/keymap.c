@@ -20,10 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 
-enum my_keyball_keycodes {
-    OLED_IN,                      // OLED ページ変更
-};
-
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // keymap for default (VIA)
@@ -104,7 +100,7 @@ bool oled_task_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case OLED_IN: change_page(record->event.pressed); return true;
+        case KC_BTN5: change_page(record->event.pressed); return true;
 
         default: break;
     }

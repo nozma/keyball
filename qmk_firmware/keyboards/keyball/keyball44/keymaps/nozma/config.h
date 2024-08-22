@@ -42,3 +42,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KEYBALL_SCROLL_DIV_DEFAULT 7
 
 #define BONGO_ENABLE
+
+#define LAYER_STATE_8BIT

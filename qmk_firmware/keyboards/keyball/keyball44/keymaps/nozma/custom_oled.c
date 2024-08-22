@@ -117,14 +117,14 @@ static void print_cpi_status(void) {
 }
 
 // Lockキー状態表示
-static void print_lock_key_status(void) {
-    oled_set_cursor(0, 6);
-
-    const led_t led_state = host_keyboard_led_state();
-    oled_write_P(led_state.caps_lock   ? PSTR("C ") : PSTR("- "), false);
-    oled_write_P(led_state.num_lock    ? PSTR("N ") : PSTR("- "), false);
-    oled_write_P(led_state.scroll_lock ? PSTR("S")  : PSTR("-") , false);
-}
+//static void print_lock_key_status(void) {
+//    oled_set_cursor(0, 6);
+//
+//    const led_t led_state = host_keyboard_led_state();
+//    oled_write_P(led_state.caps_lock   ? PSTR("C ") : PSTR("- "), false);
+//    oled_write_P(led_state.num_lock    ? PSTR("N ") : PSTR("- "), false);
+//    oled_write_P(led_state.scroll_lock ? PSTR("S")  : PSTR("-") , false);
+//}
 
 // レイヤーNo表示
 static void print_layer_status(void) {
@@ -149,7 +149,7 @@ static void print_scroll_status(void) {
 // デフォルトページ表示
 static void render_default(void) {
     print_cpi_status();
-    print_lock_key_status();
+//    print_lock_key_status();
     print_layer_status();
     print_scroll_status();
 }

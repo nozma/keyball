@@ -17,6 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#ifdef BONGO_ENABLE
+#include "bongo.h"
+#endif
 
 #include "quantum.h"
 
@@ -84,7 +87,8 @@ void oledkit_render_info_user(void) {
 
 // サブ側OLEDの表示処理
 void oledkit_render_logo_user(void) {
-    keyball_oled_render_mysub();
+    //keyball_oled_render_mysub();
+    draw_bongo(false);
 }
 
 // メイン、サブの判定

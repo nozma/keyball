@@ -183,18 +183,6 @@ static void render_status(void) {
 #  endif
 }
 
-// バージョン表示
-#include "version.h"
-static void render_version(void) {
-    oled_write_P(PSTR("Ver.\n\n"), false);
-    oled_write_ln_P(PSTR(QMK_BUILDDATE), false);
-    oled_write_P(PSTR("\n"), false);
-    oled_write_ln_P(PSTR(QMK_KEYMAP), false);
-    oled_write_P(PSTR("\n"), false);
-    oled_write_ln_P(PSTR(QMK_VERSION), false);
-}
-
-
 // ページ切り替え
 static uint8_t page_no = 0;
 void change_page(bool pressed) {
@@ -207,14 +195,8 @@ void change_page(bool pressed) {
 
 // OLEDメイン処理(メイン側)
 void keyball_oled_render_mymain(void) {
-    switch(page_no % 3) {
-        case 1:  render_version(); break;
-        case 2:  render_status(); break;
+    switch(page_no % 2) {
+        case 1:  render_status(); break;
         default: render_default();  break;
     }
-}
-
-// OLEDメイン処理(サブ側)
-void keyball_oled_render_mysub(void) {
-    render_status();
 }

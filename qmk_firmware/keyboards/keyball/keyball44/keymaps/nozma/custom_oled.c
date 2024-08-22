@@ -154,49 +154,7 @@ static void render_default(void) {
     print_scroll_status();
 }
 
-// ステータス表示
-static void render_status(void) {
-    oled_write_ln_P(PSTR("STATE"), false);
-
-    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
-#  ifdef LAYER_LED_ENABLE
-    oled_write_P(layer_led ? PSTR("lay o") : PSTR("lay -"), false);
-#  endif
-    oled_write_P(PSTR("spd "), false);
-    oled_write(itoc(rgblight_get_speed(), 0), false);
-
-    oled_write_P(PSTR("mo"), false);
-    oled_write(itoc(rgblight_get_mode(), 3), false);
-
-    oled_set_cursor(0, 7);
-    oled_write_P(PSTR("h "), false);
-    oled_write(itoc(rgblight_get_hue(), 3), false);
-
-    oled_write_P(PSTR("s "), false);
-    oled_write(itoc(rgblight_get_sat(), 3), false);
-
-    oled_write_P(PSTR("v "), false);
-    oled_write_ln(itoc(rgblight_get_val(), 3), false);
-
-#  ifdef COMBO_ENABLE
-    oled_write_P(is_combo_enabled() ? PSTR("cmb o") : PSTR("cmb -"), false);
-#  endif
-}
-
-// ページ切り替え
-static uint8_t page_no = 0;
-void change_page(bool pressed) {
-    if (!pressed) {
-        return;
-    }
-    oled_clear();
-    page_no ++;
-}
-
 // OLEDメイン処理(メイン側)
 void keyball_oled_render_mymain(void) {
-    switch(page_no % 2) {
-        case 1:  render_status(); break;
-        default: render_default();  break;
-    }
+    render_default();
 }

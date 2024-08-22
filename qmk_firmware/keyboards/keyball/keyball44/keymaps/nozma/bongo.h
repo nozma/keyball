@@ -198,24 +198,4 @@ static void draw_bongo(bool minimal)
             break;
     }
 
-    if (!minimal)
-    {
-        // print wpm
-        //oled_set_cursor(0, 0);
-        //sprintf(wpm, "WPM:%03d", get_current_wpm());
-        //oled_write(wpm, false);
-
-        // calculate && print clock
-        //oled_set_cursor(0, 2);
-        //uint8_t  hour = last_minute / 60;
-        //uint16_t minute = last_minute % 60;
-        //bool is_pm = (hour / 12) > 0;
-        //hour = hour % 12;
-        //if (hour == 0) {
-        //    hour = 12;
-        //}
-        //static char time_str[8] = "";
-        //sprintf(time_str, "%02d:%02d%s", hour, minute, is_pm ? "pm" : "am");
-        //oled_write(time_str, false);
-    }
 }

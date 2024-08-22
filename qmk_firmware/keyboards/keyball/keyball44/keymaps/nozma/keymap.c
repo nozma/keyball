@@ -66,9 +66,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 #include "lib/oledkit/oledkit.h"
 #include "custom_oled.c"
-// 画面は両側回転させるように修正します。
+
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    return OLED_ROTATION_270;
+    if (is_keyboard_master()) {
+        return OLED_ROTATION_270;
+    }
+    return rotation;
 }
 
 // メイン、サブの判定

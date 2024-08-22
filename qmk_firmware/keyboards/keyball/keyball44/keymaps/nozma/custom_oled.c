@@ -207,8 +207,9 @@ void change_page(bool pressed) {
 
 // OLEDメイン処理(メイン側)
 void keyball_oled_render_mymain(void) {
-    switch(page_no % 2) {
+    switch(page_no % 3) {
         case 1:  render_version(); break;
+        case 2:  render_status(); break;
         default: render_default();  break;
     }
 }

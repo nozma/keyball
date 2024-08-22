@@ -153,12 +153,7 @@ static void draw_bongo(bool minimal)
     switch (anim_state)
     {
         case Idle:
-            oled_write_raw_P(idle[abs((IDLE_FRAMES - 1) - current_idle_frame)], ANIM_SIZE);
-            if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION)
-            {
-                current_idle_frame = (current_idle_frame + 1) % IDLE_FRAMES;
-                anim_timer = timer_read32();
-            }
+            oled_write_raw_P(idle[0], ANIM_SIZE);
             break;
 
         case Prep:

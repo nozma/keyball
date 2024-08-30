@@ -18,6 +18,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "quantum.h"
 #include "pmw3360.h"
 
+#include "hardware/spi.h"
+#include "pico/stdlib.h"
+
+#define PMW3360_SPI_PORT spi0  // 使用するSPIポート
+#define PMW3360_SCK_PIN  18    // SCKピン
+#define PMW3360_MOSI_PIN 19    // MOSIピン
+#define PMW3360_MISO_PIN 16    // MISOピン
+#define PMW3360_CS_PIN   17    // チップセレクトピン
+
+#define PMW3360_SPI_BAUDRATE 2000000  // 2 MHz
+
+bool pmw3360_spi_start(void) {
+    spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
+    gpio_set_function(PMW3360_SCK_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(PMW3360_MOSI_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(PMW3360_MISO_PIN, GPIO_FUNC_SPI);
+    gpio_init(PMW3360_CS_PIN);
+    gpio_set_dir(PMW3360_CS_PIN, GPIO_OUT);
+    gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
+
+    // SPIモード設定（モード3）
+    spi_set_format(PMW3360_SPI_PORT, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
+
+    // チップセレクトをアクティブに
+    gpio_put(PMW3360_CS_PIN, 0);
+
+    return true;
+}
+
+void pmw3360_spi_stop(void) {
+    // チップセレクトを非アクティブに
+    gpio_put(PMW3360_CS_PIN, 1);
+}
+
 // Include SROM definitions.
 #include "srom_0x04.c"
 #include "srom_0x81.c"
@@ -36,16 +70,17 @@ bool pmw3360_spi_start(void) {
     return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
 }
 
-uint8_t pmw3360_reg_read(uint8_t addr) {
+void pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
-    spi_write(addr & 0x7f);
-    wait_us(160);
-    uint8_t data = spi_read();
-    wait_us(1);
-    spi_stop();
-    wait_us(19);
-    // Reset motion_bursting mode if read from a register other than motion
-    // burst register.
+    spi_write_blocking(PMW3360_SPI_PORT, &addr, 1);
+    sleep_us(160);
+    uint8_t data;
+    spi_read_blocking(PMW3360_SPI_PORT, 0, &data, 1);
+    sleep_us(1);
+    pmw3360_spi_stop();
+    sleep_us(19);
+
+    // motion_burstingモードのリセット
     if (addr != pmw3360_Motion_Burst) {
         motion_bursting = false;
     }
@@ -54,11 +89,11 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
 
 void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     pmw3360_spi_start();
-    spi_write(addr | 0x80);
-    spi_write(data);
-    wait_us(35);
-    spi_stop();
-    wait_us(145);
+    uint8_t command[] = { addr | 0x80, data };
+    spi_write_blocking(PMW3360_SPI_PORT, command, 2);
+    sleep_us(35);
+    pmw3360_spi_stop();
+    sleep_us(145);
 }
 
 uint8_t pmw3360_cpi_get(void) {

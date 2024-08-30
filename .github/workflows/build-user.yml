@@ -9,7 +9,7 @@ on:
         type: choice
         options:
         - keyball44
-        - keyball44_RP2040
+        - keyball44RP2040
         - keyball39
         - keyball61
         - keyball46

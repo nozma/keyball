@@ -60,3 +60,6 @@ SRC += $(PICO_SDK_PATH)/src/rp2_common/hardware_spi/spi.c
 CFLAGS += -I$(PICO_SDK_PATH)/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_spi/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/common/pico_stdlib/include
+# 必要なPico SDKのライブラリをリンク
+LDFLAGS += -L$(PICO_SDK_PATH)/build/lib
+LDFLAGS += -lpico_stdlib -lhardware_spi

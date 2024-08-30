@@ -17,17 +17,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
-
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
 
-#define PMW3360_SPI_PORT spi0  // 使用するSPIポート
-#define PMW3360_SCK_PIN  18    // SCKピン
-#define PMW3360_MOSI_PIN 19    // MOSIピン
-#define PMW3360_MISO_PIN 16    // MISOピン
-#define PMW3360_CS_PIN   17    // チップセレクトピン
+// Include SROM definitions.
+#include "srom_0x04.c"
+#include "srom_0x81.c"
 
-#define PMW3360_SPI_BAUDRATE 2000000  // 2 MHz
+#define PMW3360_SPI_MODE 3
+#define PMW3360_CLOCKS 2000000
+#define PMW3360_SPI_PORT spi0
+#define PMW3360_SCK_PIN  18
+#define PMW3360_MOSI_PIN 19
+#define PMW3360_MISO_PIN 16
+#define PMW3360_CS_PIN   17
+#define PMW3360_SPI_BAUDRATE 2000000
+
+static bool motion_bursting = false;
 
 bool pmw3360_spi_start(void) {
     spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
@@ -36,41 +42,19 @@ bool pmw3360_spi_start(void) {
     gpio_set_function(PMW3360_MISO_PIN, GPIO_FUNC_SPI);
     gpio_init(PMW3360_CS_PIN);
     gpio_set_dir(PMW3360_CS_PIN, GPIO_OUT);
-    gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
+    gpio_put(PMW3360_CS_PIN, 1);
 
-    // SPIモード設定（モード3）
     spi_set_format(PMW3360_SPI_PORT, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
 
-    // チップセレクトをアクティブに
     gpio_put(PMW3360_CS_PIN, 0);
-
     return true;
 }
 
 void pmw3360_spi_stop(void) {
-    // チップセレクトを非アクティブに
     gpio_put(PMW3360_CS_PIN, 1);
 }
 
-// Include SROM definitions.
-#include "srom_0x04.c"
-#include "srom_0x81.c"
-
-#define PMW3360_SPI_MODE 3
-#ifdef F_CPU
-#define PMW3360_SPI_DIVISOR (F_CPU / PMW3360_CLOCKS)
-#else
-#define PMW3360_SPI_DIVISOR (clock_get_hz(clk_sys) / PMW3360_CLOCKS)
-#endif
-#define PMW3360_CLOCKS 2000000
-
-static bool motion_bursting = false;
-
-bool pmw3360_spi_start(void) {
-    return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
-}
-
-void pmw3360_reg_read(uint8_t addr) {
+uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
     spi_write_blocking(PMW3360_SPI_PORT, &addr, 1);
     sleep_us(160);
@@ -80,7 +64,6 @@ void pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_stop();
     sleep_us(19);
 
-    // motion_burstingモードのリセット
     if (addr != pmw3360_Motion_Burst) {
         motion_bursting = false;
     }

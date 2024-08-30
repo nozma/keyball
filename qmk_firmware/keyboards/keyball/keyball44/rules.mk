@@ -49,3 +49,14 @@ SRC += lib/keyball/keyball.c
 SPACE_CADET_ENABLE = no
 GRAVE_ESC_ENABLE = no
 MAGIC_ENABLE = no
+
+# Pico SDKのパスを指定
+PICO_SDK_PATH = lib/pico-sdk-master
+
+# Cソースファイルのディレクトリを追加
+SRC += $(PICO_SDK_PATH)/src/rp2_common/hardware_spi/spi.c
+
+# インクルードディレクトリを指定
+CFLAGS += -I$(PICO_SDK_PATH)/include
+CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_spi/include
+CFLAGS += -I$(PICO_SDK_PATH)/src/common/pico_stdlib/include

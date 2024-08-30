@@ -27,6 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define PMW3360_NCS_PIN GP21
 #endif
 
+#ifdef F_CPU
+#define PMW3360_SPI_DIVISOR (F_CPU / PMW3360_CLOCKS)
+#else
+#define PMW3360_SPI_DIVISOR (clock_get_hz(clk_sys) / PMW3360_CLOCKS)
+#endif
+
 /// DEBUG_PMW3360_SCAN_RATE enables scan performance counter.
 /// It records scan count in a last second and enables pmw3360_scan_rate_get().
 /// Additionally, it will be logged automatically when defined CONSOLE_ENABLE

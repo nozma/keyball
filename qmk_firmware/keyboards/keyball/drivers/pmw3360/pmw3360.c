@@ -30,6 +30,7 @@ static bool motion_bursting = false;
 
 void pmw3360_spi_init(void) {
     spi_init();
+    oled_write_ln("SPI init", false);
     setPinOutput(PMW3360_NCS_PIN);
     writePinHigh(PMW3360_NCS_PIN);
 }
@@ -152,7 +153,6 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 
 bool pmw3360_init(void) {
     pmw3360_spi_init();
-    oled_write_ln("SPI init", false);
 
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);

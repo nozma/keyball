@@ -163,7 +163,7 @@ bool pmw3360_spi_test(void) {
     return test_value == read_value;
 }
 
-#include "spi.h"  // 必要なSPI関連のヘッダーをインクルード
+//#include "spi.h"  // 必要なSPI関連のヘッダーをインクルード
 
 void spi_init(void) {
     // SPIモードとクロック速度を設定

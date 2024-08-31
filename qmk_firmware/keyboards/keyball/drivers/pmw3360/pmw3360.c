@@ -134,6 +134,7 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 }
 
 bool pmw3360_init(void) {
+    oled_write_ln_P(PSTR("Initializing PMW3360"), false); // debug
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
     // reboot
@@ -153,6 +154,7 @@ bool pmw3360_init(void) {
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     spi_stop();
     return pid == 0x42 && rev == 0x01;
+    oled_write_ln_P(PSTR("Initializing PMW3360"), false); //debug
 }
 
 uint8_t pmw3360_srom_id = 0;

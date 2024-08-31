@@ -61,7 +61,10 @@ bool rp2040_gpio_get(uint pin) {
 }
 
 // タイマーを使用したマイクロ秒単位の待機関数
+#ifndef TIMER_BASE
 #define TIMER_BASE 0x40054000
+#endif
+
 #define TIMER_TIMELR (*(volatile uint32_t *)(TIMER_BASE + 0x004))
 
 void rp2040_sleep_us(uint32_t us) {

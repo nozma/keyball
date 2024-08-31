@@ -33,7 +33,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static bool motion_bursting = false;
 
 bool pmw3360_spi_start(void) {
-    return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
+    oled_write_ln("SPI Start", false);  // 追加: SPI開始ログ
+    bool result = spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
+    if (!result) {
+        oled_write_ln("SPI Start Failed", false);
+    }
+    return result;
+}
+
+void pmw3360_spi_stop(void) {
+    spi_stop();
+    oled_write_ln("SPI Stop", false);  // 追加: SPI終了ログ
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
@@ -148,26 +158,29 @@ bool pmw3360_spi_test(void) {
     uint8_t test_value = 0xAB;
     uint8_t read_value;
 
-    // テストレジスタに書き込み
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Config2, test_value);
     wait_us(160);
-    spi_stop();
-    wait_us(160);
+    pmw3360_spi_stop();
 
-    // テストレジスタから読み取り
     pmw3360_spi_start();
     read_value = pmw3360_reg_read(pmw3360_Config2);
-    spi_stop();
+    pmw3360_spi_stop();
 
-    // OLEDに結果を表示
     oled_write_ln("SPI Test", false);
     oled_write("Sent: ", false);
     oled_write_hex(test_value);
     oled_write(" Recv: ", false);
     oled_write_hex(read_value);
 
-    return (test_value == read_value);
+    if (test_value != read_value) {
+        oled_write_ln("SPI Test Failed", false);  // 既存のログ
+        oled_write("Check wiring, mode, and clock.", false);  // 追加: エラー説明
+        return false;
+    }
+    
+    oled_write_ln("SPI Test Passed", false);  // 追加: 成功時のログ
+    return true;
 }
 
 void spi_init(void) {
@@ -184,9 +197,11 @@ void spi_init(void) {
 }
 
 bool pmw3360_init(void) {
-    pmw3360_spi_start();
+    if (!pmw3360_spi_start()) {
+        oled_write_ln("SPI Start Failed", false);
+        return false;
+    }
 
-    // テスト実行
     if (!pmw3360_spi_test()) {
         oled_write_ln("SPI Test Failed", false);
         return false;
@@ -194,7 +209,7 @@ bool pmw3360_init(void) {
 
     // センサーリセット
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5A);
-    wait_ms(50); // リセット後の待機
+    wait_ms(50);
 
     // モーションデータの読み捨て
     pmw3360_reg_read(pmw3360_Motion);
@@ -206,8 +221,10 @@ bool pmw3360_init(void) {
     // センサー設定の初期化
     pmw3360_reg_write(pmw3360_Config2, 0x00);
 
-    // SROMのアップロード (選択したSROMを渡す)
-    pmw3360_srom_upload(&pmw3360_srom_0x81);  // 例えば 0x81 の SROM を使用する場合
+    // SROMのアップロード
+    oled_write_ln("Uploading SROM...", false);  // 追加: SROM開始ログ
+    pmw3360_srom_upload(&pmw3360_srom_0x81);
+    oled_write_ln("SROM Upload Done", false);  // 追加: SROM終了ログ
 
     // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
@@ -218,10 +235,10 @@ bool pmw3360_init(void) {
         return false;
     } else {
         oled_write_ln("PMW3360 init OK", false);
+        return true;
     }
 
-    spi_stop();
-    return true;
+    pmw3360_spi_stop();
 }
 
 uint8_t pmw3360_srom_id = 0;
@@ -237,10 +254,15 @@ void pmw3360_srom_upload(const pmw3360_srom_t *srom) {
     wait_us(15);
 
     for (size_t i = 0; i < srom->len; i++) {
-        spi_write(pgm_read_byte(&srom->data[i]));
+        uint8_t byte = pgm_read_byte(&srom->data[i]);
+        spi_write(byte);
         wait_us(15);
+        
+        oled_write("SROM Byte: ", false);  // 追加: 送信データのログ
+        oled_write_hex(byte);
+        oled_write_ln("", false);
     }
 
-    spi_stop();
+    pmw3360_spi_stop();
     wait_us(200);
 }

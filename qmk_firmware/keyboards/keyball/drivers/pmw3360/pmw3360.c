@@ -136,10 +136,10 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 #include "print.h"  // デバッグ機能を使用するためのインクルード
 
 bool pmw3360_init(void) {
-    print("Initializing PMW3360...\n");
+    oled_write_ln("Init PMW3360", false);
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
-    
+
     // リセット
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
@@ -160,16 +160,17 @@ bool pmw3360_init(void) {
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     spi_stop();
 
+    // デバッグ情報をOLEDに表示
     if (pid != 0x42 || rev != 0x01) {
-        print("PMW3360 initialization failed: PID=");
-        print_hex8(pid);  // 修正点: print_hexからprint_hex8に変更
-        print(" REV=");
-        print_hex8(rev);  // 修正点: print_hexからprint_hex8に変更
-        print("\n");
+        oled_write_ln("PMW3360 init fail", false);
+        oled_write("PID: ", false);
+        oled_write_hex8(pid);
+        oled_write(" REV: ", false);
+        oled_write_hex8(rev);
         return false;
     }
 
-    print("PMW3360 initialized successfully.\n");
+    oled_write_ln("PMW3360 OK", false);
     return true;
 }
 

@@ -181,8 +181,8 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_move(keyball_motion_
 #    error("unknown Keyball model")
 #endif
     // adjust for rp2040
-    r->x = -r->y;
-    r->y = -r->x;
+    r->x = clip2int8(m->y);
+    r->y = clip2int8(m->x);
     // clear motion
     m->x = 0;
     m->y = 0;

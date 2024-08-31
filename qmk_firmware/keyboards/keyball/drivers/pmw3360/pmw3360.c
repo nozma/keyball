@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
 
+// spi_initを別の名前にエイリアス
+#define pico_spi_init spi_init
+
 // Include SROM definitions.
 #include "srom_0x04.c"
 #include "srom_0x81.c"
@@ -36,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static bool motion_bursting = false;
 
 bool pmw3360_spi_start(void) {
-    spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
+    pico_spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
     gpio_set_function(PMW3360_SCK_PIN, GPIO_FUNC_SPI);
     gpio_set_function(PMW3360_MOSI_PIN, GPIO_FUNC_SPI);
     gpio_set_function(PMW3360_MISO_PIN, GPIO_FUNC_SPI);
@@ -152,7 +155,7 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 }
 
 bool pmw3360_init(void) {
-    spi_init();
+    pico_spi_init();
     setPinOutput(PMW3360_NCS_PIN);
     // reboot
     pmw3360_spi_start();

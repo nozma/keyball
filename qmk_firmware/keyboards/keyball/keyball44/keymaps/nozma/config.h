@@ -63,3 +63,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SPI_MOSI_PIN GP23
 #define SPI_MISO_PIN GP20
 #define PMW33XX_CS_PIN GP21 // SPI CS pin.
+#define PMW33XX_CPI 1600 // CPI設定
+#define PMW33XX_CLOCK_SPEED 2000000 // クロック速度の設定

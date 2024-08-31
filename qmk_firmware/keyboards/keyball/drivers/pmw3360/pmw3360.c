@@ -135,37 +135,30 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 
 #include "oled_driver.h"
 #include "stdio.h"
+#include "spi_master.h"  // QMKのSPI通信関連のヘッダー
 
-bool pmw3360_spi_test(void) {
-    uint8_t test_value = 0xAB;  // テスト用の値
+bool spi_loopback_test(void) {
+    uint8_t test_value = 0xAB;  // 送信するテストデータ
     uint8_t read_value;
 
-    // テストレジスタに書き込み
-    pmw3360_spi_start();
-    pmw3360_reg_write(pmw3360_Config2, test_value);
-    wait_us(200);
-    pmw3360_spi_stop();
-    wait_us(200);
+    // 送信
+    spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
+    spi_write(test_value);
+    read_value = spi_read();
+    spi_stop();
 
-    // 読み取り
-    pmw3360_spi_start();
-    read_value = pmw3360_reg_read(pmw3360_Config2);
-    pmw3360_spi_stop();
-
-    // OLEDに結果を表示
-    oled_write_ln("SPI Test", false);
-    oled_write("Written: ", false);
+    // 結果をOLEDに表示
+    oled_write_ln("SPI Loopback", false);
+    oled_write("Sent: ", false);
     char buffer[8];
     snprintf(buffer, sizeof(buffer), "%02X", test_value);
     oled_write(buffer, false);
-    oled_write(" Read: ", false);
+    oled_write(" Recv: ", false);
     snprintf(buffer, sizeof(buffer), "%02X", read_value);
     oled_write(buffer, false);
 
     return test_value == read_value;
 }
-
-#include "spi_master.h"  // QMKのSPI通信関連のヘッダー
 
 void spi_init(void) {
     // SPI設定
@@ -183,7 +176,7 @@ void spi_init(void) {
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);
     spi_init();
-        if (!pmw3360_spi_test()) {
+        if (!pmw3360_loopback_test()) {
         oled_write_ln("SPI Test Failed", false);
         return false;
     }

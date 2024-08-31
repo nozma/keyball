@@ -94,17 +94,16 @@ uint32_t pmw3360_scan_rate_get(void) {
 }
 
 bool pmw3360_motion_read(pmw3360_motion_t *d) {
-#ifdef DEBUG_PMW3360_SCAN_RATE
-    pmw3360_scan_perf_task();
-#endif
     uint8_t mot = pmw3360_reg_read(pmw3360_Motion);
-    if ((mot & 0x88) != 0x80) {
-        return false;
+    if ((mot & 0x80) == 0) {
+        return false; // データが利用できない場合は false を返す
     }
+
     d->x = pmw3360_reg_read(pmw3360_Delta_X_L);
     d->x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
     d->y = pmw3360_reg_read(pmw3360_Delta_Y_L);
     d->y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
+
     return true;
 }
 
@@ -137,27 +136,30 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 #include "stdio.h"
 #include "spi_master.h"  // QMKのSPI通信関連のヘッダー
 
-bool spi_loopback_test(void) {
-    uint8_t test_value = 0xAB;  // 送信するテストデータ
+bool pmw3360_spi_test(void) {
+    uint8_t test_value = 0xAB;
     uint8_t read_value;
 
-    // 送信
-    spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
-    spi_write(test_value);
-    read_value = spi_read();
+    // テストレジスタに書き込み
+    pmw3360_spi_start();
+    pmw3360_reg_write(pmw3360_Config2, test_value);
+    wait_us(160);
+    spi_stop();
+    wait_us(160);
+
+    // テストレジスタから読み取り
+    pmw3360_spi_start();
+    read_value = pmw3360_reg_read(pmw3360_Config2);
     spi_stop();
 
-    // 結果をOLEDに表示
-    oled_write_ln("SPI Loopback", false);
+    // OLEDに結果を表示
+    oled_write_ln("SPI Test", false);
     oled_write("Sent: ", false);
-    char buffer[8];
-    snprintf(buffer, sizeof(buffer), "%02X", test_value);
-    oled_write(buffer, false);
+    oled_write_hex(test_value);
     oled_write(" Recv: ", false);
-    snprintf(buffer, sizeof(buffer), "%02X", read_value);
-    oled_write(buffer, false);
+    oled_write_hex(read_value);
 
-    return test_value == read_value;
+    return (test_value == read_value);
 }
 
 void spi_init(void) {
@@ -173,19 +175,18 @@ void spi_init(void) {
     }
 }
 
-bool pmw3360_init(void) {
-    oled_write_ln("Init PMW3360", false);
-    spi_init();
-        if (!spi_loopback_test()) {
-        oled_write_ln("SPI Test Failed", false);
-        return false;
-    }
-    setPinOutput(PMW3360_NCS_PIN);
-
-    // リセット
+void pmw3360_init(void) {
     pmw3360_spi_start();
-    pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
-    wait_ms(50);
+
+    // テスト実行
+    if (!pmw3360_spi_test()) {
+        oled_write_ln("SPI Test Failed", false);
+        return 1;
+    }
+
+    // センサーリセット
+    pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5A);
+    wait_ms(50); // リセット後の待機
 
     // モーションデータの読み捨て
     pmw3360_reg_read(pmw3360_Motion);
@@ -194,53 +195,42 @@ bool pmw3360_init(void) {
     pmw3360_reg_read(pmw3360_Delta_Y_L);
     pmw3360_reg_read(pmw3360_Delta_Y_H);
 
-    // 設定
+    // センサー設定の初期化
     pmw3360_reg_write(pmw3360_Config2, 0x00);
+
+    // SROMのアップロード
+    pmw3360_srom_upload();
 
     // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
-    spi_stop();
 
-    // 16進数の値を表示するためのバッファ
-    char buffer[8];
-
-    // デバッグ情報をOLEDに表示
     if (pid != 0x42 || rev != 0x01) {
         oled_write_ln("PMW3360 init fail", false);
-        oled_write("PID: ", false);
-        snprintf(buffer, sizeof(buffer), "%02X", pid);
-        oled_write(buffer, false);
-        oled_write(" REV: ", false);
-        snprintf(buffer, sizeof(buffer), "%02X", rev);
-        oled_write(buffer, false);
-        return false;
+    } else {
+        oled_write_ln("PMW3360 init OK", false);
     }
 
-    oled_write_ln("PMW3360 OK", false);
-    return true;
+    spi_stop();
 }
 
 uint8_t pmw3360_srom_id = 0;
 
-void pmw3360_srom_upload(pmw3360_srom_t srom) {
+void pmw3360_srom_upload(void) {
     pmw3360_reg_write(pmw3360_Config2, 0x00);
-    pmw3360_reg_write(pmw3360_SROM_Enable, 0x1d);
+    pmw3360_reg_write(pmw3360_SROM_Enable, 0x1D);
     wait_us(10);
     pmw3360_reg_write(pmw3360_SROM_Enable, 0x18);
 
-    // SROM upload (download for PMW3360) with burst mode
     pmw3360_spi_start();
     spi_write(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
-    for (size_t i = 0; i < srom.len; i++) {
-        spi_write(pgm_read_byte(srom.data + i));
+
+    for (size_t i = 0; i < sizeof(FIRMWARE); i++) {
+        spi_write(pgm_read_byte(&FIRMWARE[i]));
         wait_us(15);
     }
+
     spi_stop();
     wait_us(200);
-
-    pmw3360_srom_id = pmw3360_reg_read(pmw3360_SROM_ID);
-    pmw3360_reg_write(pmw3360_Config2, 0x00);
-    wait_ms(10);
 }

@@ -17,19 +17,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
+#include "hardware/spi.h"
+#include "hardware/delay.h"
 
 // Include SROM definitions.
 #include "srom_0x04.c"
 #include "srom_0x81.c"
 
 #define PMW3360_SPI_MODE 3
-#define PMW3360_SPI_DIVISOR (F_CPU / PMW3360_CLOCKS)
 #define PMW3360_CLOCKS 2000000
 
 static bool motion_bursting = false;
 
+void spi_init(void) {
+    spi_init(spi0, PMW3360_CLOCKS);  // SPIを2MHzで初期化
+    gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
+    gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
+    gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
+    gpio_set_function(PMW3360_NCS_PIN, GPIO_FUNC_SIO);
+
+    // Chip Selectピンの初期状態をHighに設定
+    gpio_put(PMW3360_NCS_PIN, 1);
+    gpio_set_dir(PMW3360_NCS_PIN, GPIO_OUT);
+}
+
 bool pmw3360_spi_start(void) {
-    return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
+    gpio_put(PMW3360_NCS_PIN, 0);  // CSをLowにして通信を開始
+    return true;
+}
+
+void pmw3360_spi_stop(void) {
+    gpio_put(PMW3360_NCS_PIN, 1);  // CSをHighにして通信を終了
+}
+
+void spi_write(uint8_t data) {
+    spi_write_blocking(spi0, &data, 1);
+}
+
+uint8_t spi_read(void) {
+    uint8_t data;
+    spi_read_blocking(spi0, 0x00, &data, 1);  // ダミーの0x00を送信してデータを読み取る
+    return data;
+}
+
+void wait_us(uint32_t us) {
+    sleep_us(us);
+}
+
+void wait_ms(uint32_t ms) {
+    sleep_ms(ms);
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
@@ -38,7 +74,7 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
     wait_us(160);
     uint8_t data = spi_read();
     wait_us(1);
-    spi_stop();
+    pmw3360_spi_stop();
     wait_us(19);
     // Reset motion_bursting mode if read from a register other than motion
     // burst register.
@@ -53,7 +89,7 @@ void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     spi_write(addr | 0x80);
     spi_write(data);
     wait_us(35);
-    spi_stop();
+    pmw3360_spi_stop();
     wait_us(145);
 }
 
@@ -123,7 +159,7 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     d->x |= spi_read() << 8;
     d->y = spi_read();
     d->y |= spi_read() << 8;
-    spi_stop();
+    pmw3360_spi_stop();
     // Required NCS in 500ns after motion burst.
     wait_us(1);
     return true;
@@ -132,22 +168,27 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 bool pmw3360_init(void) {
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
-    // reboot
+
+    // センサーリセット
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
-    // read five registers of motion and discard those values
+
+    // モーションデータの読み捨て
     pmw3360_reg_read(pmw3360_Motion);
     pmw3360_reg_read(pmw3360_Delta_X_L);
     pmw3360_reg_read(pmw3360_Delta_X_H);
     pmw3360_reg_read(pmw3360_Delta_Y_L);
     pmw3360_reg_read(pmw3360_Delta_Y_H);
-    // configuration
+
+    // センサー設定の初期化
     pmw3360_reg_write(pmw3360_Config2, 0x00);
-    // check product ID and revision ID
+
+    // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
-    spi_stop();
+    pmw3360_spi_stop();
+
     return pid == 0x42 && rev == 0x01;
 }
 
@@ -164,10 +205,11 @@ void pmw3360_srom_upload(pmw3360_srom_t srom) {
     spi_write(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
     for (size_t i = 0; i < srom.len; i++) {
-        spi_write(pgm_read_byte(srom.data + i));
+        uint8_t byte = pgm_read_byte(srom.data + i);
+        spi_write(byte);
         wait_us(15);
     }
-    spi_stop();
+    pmw3360_spi_stop();
     wait_us(200);
 
     pmw3360_srom_id = pmw3360_reg_read(pmw3360_SROM_ID);

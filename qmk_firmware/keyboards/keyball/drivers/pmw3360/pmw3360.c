@@ -17,8 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
-#include "hardware/spi.h"
-#include "hardware/delay.h"
 
 // Include SROM definitions.
 #include "srom_0x04.c"
@@ -30,42 +28,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static bool motion_bursting = false;
 
 void spi_init(void) {
-    spi_init(spi0, PMW3360_CLOCKS);  // SPIを2MHzで初期化
-    gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
-    gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
-    gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
-    gpio_set_function(PMW3360_NCS_PIN, GPIO_FUNC_SIO);
-
-    // Chip Selectピンの初期状態をHighに設定
-    gpio_put(PMW3360_NCS_PIN, 1);
-    gpio_set_dir(PMW3360_NCS_PIN, GPIO_OUT);
+    // QMKのAPIでSPIを初期化
+    spi_init();
+    setPinOutput(PMW3360_NCS_PIN);
+    writePinHigh(PMW3360_NCS_PIN);  // 初期状態をHighに
 }
 
 bool pmw3360_spi_start(void) {
-    gpio_put(PMW3360_NCS_PIN, 0);  // CSをLowにして通信を開始
+    writePinLow(PMW3360_NCS_PIN);  // CSをLowにして通信を開始
     return true;
 }
 
 void pmw3360_spi_stop(void) {
-    gpio_put(PMW3360_NCS_PIN, 1);  // CSをHighにして通信を終了
+    writePinHigh(PMW3360_NCS_PIN);  // CSをHighにして通信を終了
 }
 
 void spi_write(uint8_t data) {
-    spi_write_blocking(spi0, &data, 1);
+    spi_write8(data);
 }
 
 uint8_t spi_read(void) {
-    uint8_t data;
-    spi_read_blocking(spi0, 0x00, &data, 1);  // ダミーの0x00を送信してデータを読み取る
-    return data;
+    return spi_read8();
 }
 
 void wait_us(uint32_t us) {
-    sleep_us(us);
+    wait_us(us);
 }
 
 void wait_ms(uint32_t ms) {
-    sleep_ms(ms);
+    wait_ms(ms);
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {

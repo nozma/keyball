@@ -163,11 +163,19 @@ bool pmw3360_spi_test(void) {
     return test_value == read_value;
 }
 
+#include "spi_master.h"  // QMKのSPI通信関連のヘッダー
+
 void spi_init(void) {
     // SPI設定
-    spi_start();  // SPI通信を開始
-    spi_set_clock_divisor(SPI_CLOCK_DIV16);  // クロック速度を設定 (例: 1MHzの場合)
-    spi_set_mode(SPI_MODE_3);  // SPIモードを設定 (例: モード3)
+    pin_t slavePin = PMW3360_NCS_PIN;  // 使用しているチップセレクトピン
+    bool lsbFirst = false;  // MSBファーストで通信
+    uint8_t mode = 3;  // SPIモード3 (CPOL=1, CPHA=1)
+    uint16_t divisor = 16;  // 分周値 (例えば、クロック速度を設定)
+
+    // SPI通信を開始
+    if (!spi_start(slavePin, lsbFirst, mode, divisor)) {
+        oled_write_ln("SPI Init Failed", false);
+    }
 }
 
 bool pmw3360_init(void) {

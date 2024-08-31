@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
-#include "oled_driver.h"  // OLED表示用のヘッダーを追加
+//#include "oled_driver.h"  // OLED表示用のヘッダーを追加
 
 // Include SROM definitions.
 #include "srom_0x04.c"
@@ -37,6 +37,7 @@ void pmw3360_spi_init(void) {
 
 bool pmw3360_spi_start(void) {
     writePinLow(PMW3360_NCS_PIN);
+    oled_write_ln("SPI Start", false);  // 追加: SPI開始ログ
     return true;
 }
 

@@ -134,7 +134,39 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 }
 
 #include "oled_driver.h"
-#include "stdio.h"  // 数値を文字列に変換するために使用
+#include "stdio.h"
+
+bool pmw3360_spi_test(void) {
+    uint8_t test_value = 0xAB;  // テスト用の値
+    uint8_t read_value;
+
+    // テストレジスタに書き込み
+    pmw3360_spi_start();
+    pmw3360_reg_write(pmw3360_Config2, test_value);
+    pmw3360_spi_stop();
+
+    // 読み取り
+    pmw3360_spi_start();
+    read_value = pmw3360_reg_read(pmw3360_Config2);
+    pmw3360_spi_stop();
+
+    // OLEDに結果を表示
+    oled_write_ln("SPI Test", false);
+    oled_write("Written: ", false);
+    char buffer[8];
+    snprintf(buffer, sizeof(buffer), "%02X", test_value);
+    oled_write(buffer, false);
+    oled_write(" Read: ", false);
+    snprintf(buffer, sizeof(buffer), "%02X", read_value);
+    oled_write(buffer, false);
+
+    return test_value == read_value;
+}
+
+if (!pmw3360_spi_test()) {
+    oled_write_ln("SPI Test Failed", false);
+    return false;
+}
 
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);

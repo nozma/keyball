@@ -136,6 +136,14 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 #include "stdio.h"
 #include "spi_master.h"  // QMKのSPI通信関連のヘッダー
 
+#include <stdio.h> // snprintfを使用するために追加
+
+void oled_write_hex(uint8_t value) {
+    char buffer[3]; // 2桁の16進数+終端文字のために3バイト確保
+    snprintf(buffer, sizeof(buffer), "%02X", value);
+    oled_write(buffer, false);
+}
+
 bool pmw3360_spi_test(void) {
     uint8_t test_value = 0xAB;
     uint8_t read_value;
@@ -175,13 +183,13 @@ void spi_init(void) {
     }
 }
 
-void pmw3360_init(void) {
+bool pmw3360_init(void) {
     pmw3360_spi_start();
 
     // テスト実行
     if (!pmw3360_spi_test()) {
         oled_write_ln("SPI Test Failed", false);
-        return 1;
+        return false;
     }
 
     // センサーリセット
@@ -199,7 +207,7 @@ void pmw3360_init(void) {
     pmw3360_reg_write(pmw3360_Config2, 0x00);
 
     // SROMのアップロード
-    pmw3360_srom_upload();
+    pmw3360_srom_upload(FIRMWARE);
 
     // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
@@ -207,8 +215,10 @@ void pmw3360_init(void) {
 
     if (pid != 0x42 || rev != 0x01) {
         oled_write_ln("PMW3360 init fail", false);
+        return false;
     } else {
         oled_write_ln("PMW3360 init OK", false);
+        return true;
     }
 
     spi_stop();
@@ -216,7 +226,7 @@ void pmw3360_init(void) {
 
 uint8_t pmw3360_srom_id = 0;
 
-void pmw3360_srom_upload(void) {
+void pmw3360_srom_upload(const uint8_t* firmware, size_t firmware_size) {
     pmw3360_reg_write(pmw3360_Config2, 0x00);
     pmw3360_reg_write(pmw3360_SROM_Enable, 0x1D);
     wait_us(10);
@@ -226,8 +236,8 @@ void pmw3360_srom_upload(void) {
     spi_write(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
 
-    for (size_t i = 0; i < sizeof(FIRMWARE); i++) {
-        spi_write(pgm_read_byte(&FIRMWARE[i]));
+    for (size_t i = 0; i < firmware_size; i++) {
+        spi_write(firmware[i]);
         wait_us(15);
     }
 

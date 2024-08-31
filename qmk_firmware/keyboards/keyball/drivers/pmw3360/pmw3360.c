@@ -163,6 +163,16 @@ bool pmw3360_spi_test(void) {
     return test_value == read_value;
 }
 
+#include "spi.h"  // 必要なSPI関連のヘッダーをインクルード
+
+void spi_init(void) {
+    // SPIモードとクロック速度を設定
+    spi_set_format(SPI_PORT, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);  // SPIモード3を設定
+    spi_set_baudrate(SPI_PORT, 250000);  // 250kHzにクロックを設定
+
+    // 他の初期化処理が必要ならここに追加
+}
+
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);
     spi_init();

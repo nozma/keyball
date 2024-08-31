@@ -174,7 +174,7 @@ bool pmw3360_spi_test(void) {
     oled_write_hex(read_value);
 
     if (test_value != read_value) {
-        oled_write_ln("SPI Test Failed", false);  // 既存のログ
+        oled_write_ln("SPI T F", false);  // 既存のログ
         return false;
     }
     
@@ -191,18 +191,18 @@ void spi_init(void) {
 
     // SPI通信を開始
     if (!spi_start(slavePin, lsbFirst, mode, divisor)) {
-        oled_write_ln("SPI Init Failed", false);
+        oled_write_ln("SPI I F", false);
     }
 }
 
 bool pmw3360_init(void) {
     if (!pmw3360_spi_start()) {
-        oled_write_ln("SPI Start Failed", false);
+        oled_write_ln("SPI S F", false);
         return false;
     }
 
     if (!pmw3360_spi_test()) {
-        oled_write_ln("SPI Test Failed", false);
+        oled_write_ln("SPI T F", false);
         return false;
     }
 

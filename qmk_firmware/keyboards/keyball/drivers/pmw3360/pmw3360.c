@@ -41,10 +41,10 @@ bool pmw3360_spi_start(void) {
     return result;
 }
 
-void pmw3360_spi_stop(void) {
-    spi_stop();
-    oled_write_ln("SPI Stop", false);  // 追加: SPI終了ログ
-}
+//void pmw3360_spi_stop(void) {
+//    spi_stop();
+//    oled_write_ln("SPI Stop", false);  // 追加: SPI終了ログ
+//}
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();

@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
-#include "oled_driver.h"  // OLED表示用のヘッダーを追加
 
 // Include SROM definitions.
 #include "srom_0x04.c"
@@ -30,14 +29,12 @@ static bool motion_bursting = false;
 
 void pmw3360_spi_init(void) {
     spi_init();
-    oled_write_ln("SPI init", false);
     setPinOutput(PMW3360_NCS_PIN);
     writePinHigh(PMW3360_NCS_PIN);
 }
 
 bool pmw3360_spi_start(void) {
     writePinLow(PMW3360_NCS_PIN);
-    oled_write_ln("SPI Start", false);  // 追加: SPI開始ログ
     return true;
 }
 
@@ -109,6 +106,9 @@ uint32_t pmw3360_scan_rate_get(void) {
 }
 
 bool pmw3360_motion_read(pmw3360_motion_t *d) {
+#ifdef DEBUG_PMW3360_SCAN_RATE
+    pmw3360_scan_perf_task();
+#endif
     uint8_t mot = pmw3360_reg_read(pmw3360_Motion);
     if ((mot & 0x88) != 0x80) {
         return false;
@@ -117,19 +117,18 @@ bool pmw3360_motion_read(pmw3360_motion_t *d) {
     d->x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
     d->y = pmw3360_reg_read(pmw3360_Delta_Y_L);
     d->y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
-
-    // デバッグ情報をOLEDに表示
-    char buf[32];
-    snprintf(buf, sizeof(buf), "X: %d, Y: %d", d->x, d->y);
-    oled_clear();
-    oled_write_ln(buf, false);
-    oled_render();
-
     return true;
 }
 
 bool pmw3360_motion_burst(pmw3360_motion_t *d) {
-    pmw3360_reg_write(pmw3360_Motion_Burst, 0);
+#ifdef DEBUG_PMW3360_SCAN_RATE
+    pmw3360_scan_perf_task();
+#endif
+    if (!motion_bursting) {
+        pmw3360_reg_write(pmw3360_Motion_Burst, 0);
+        motion_bursting = true;
+    }
+
     pmw3360_spi_start();
     pmw3360_spi_write(pmw3360_Motion_Burst);
     wait_us(35);
@@ -141,25 +140,11 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     d->y |= pmw3360_spi_read() << 8;
     pmw3360_spi_stop();
     wait_us(1);
-
-    // デバッグ情報をOLEDに表示
-    char buf[32];
-    snprintf(buf, sizeof(buf), "Burst X: %d, Y: %d", d->x, d->y);
-    oled_clear();
-    oled_write_ln(buf, false);
-    oled_render();
-
     return true;
 }
 
 bool pmw3360_init(void) {
     pmw3360_spi_init();
-
-    // OLEDの動作確認
-    oled_clear();
-    oled_write_ln("PMW3360 Init", false);
-    oled_render();
-    wait_ms(1000);  // 1秒間待機して表示を確認
 
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);

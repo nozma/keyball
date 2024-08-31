@@ -27,8 +27,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define PMW3360_NCS_PIN GP21
 #endif
 
-// DEBUG_PMW3360_SCAN_RATE enables scan performance counter.
-#define DEBUG_PMW3360_SCAN_RATE
+/// DEBUG_PMW3360_SCAN_RATE enables scan performance counter.
+/// It records scan count in a last second and enables pmw3360_scan_rate_get().
+/// Additionally, it will be logged automatically when defined CONSOLE_ENABLE
+/// and `debug_enable = true`.
+//#define DEBUG_PMW3360_SCAN_RATE
 
 //////////////////////////////////////////////////////////////////////////////
 // Types
@@ -100,7 +103,7 @@ enum {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-// Exported values
+// Exported values (touch carefully)
 
 /// SROM ID, last uploaded. 0 means not uploaded yet.
 extern uint8_t pmw3360_srom_id;
@@ -113,25 +116,39 @@ extern const pmw3360_srom_t pmw3360_srom_0x81;
 //////////////////////////////////////////////////////////////////////////////
 // Top level API
 
+/// pmw3360_init initializes PMW3360DM-T2QU module.
+/// It will return true when succeeded, otherwise false.
 bool pmw3360_init(void);
 
-void pmw3360_srom_upload(pmw3360_srom_t srom);
+void pmw3360_srom_upload(const pmw3360_srom_t *srom);
 
+/// pmw3360_motion_read gets a motion data by Motion register.
+/// This requires to write a dummy data to pmw3360_Motion register
+/// just before.
 bool pmw3360_motion_read(pmw3360_motion_t *d);
 
+/// pmw3360_motion_burst gets a motion data by Motion_Burst command.
+/// This requires to write a dummy data to pmw3360_Motion_Burst register
+/// just before.
 bool pmw3360_motion_burst(pmw3360_motion_t *d);
 
+/// pmw3360_scan_rate_get gets count of scan in a last second.
+/// This works only when DEBUG_PMW3360_SCAN_RATE is defined.
 uint32_t pmw3360_scan_rate_get(void);
 
+// TODO: document
 uint8_t pmw3360_cpi_get(void);
 
+// TODO: document
 void pmw3360_cpi_set(uint8_t cpi);
 
 //////////////////////////////////////////////////////////////////////////////
 // Register operations
 
+/// pmw3360_reg_write writes a value to a register.
 void pmw3360_reg_write(uint8_t addr, uint8_t data);
 
+/// pmw3360_reg_read reads a value from a register.
 uint8_t pmw3360_reg_read(uint8_t addr);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -139,8 +156,16 @@ uint8_t pmw3360_reg_read(uint8_t addr);
 
 bool pmw3360_spi_start(void);
 
-void pmw3360_spi_stop(void);
+void inline pmw3360_spi_stop(void) {
+    spi_stop();
+}
 
-void pmw3360_spi_write(uint8_t data);
+/// \deprecated use pmw3360_reg_write() instead of this.
+spi_status_t inline pmw3360_spi_write(uint8_t data) {
+    return spi_write(data);
+}
 
-uint8_t pmw3360_spi_read(void);
+/// \deprecated use pmw3360_reg_read() instead of this.
+spi_status_t inline pmw3360_spi_read(void) {
+    return spi_read();
+}

@@ -23,45 +23,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "srom_0x81.c"
 
 #define PMW3360_SPI_MODE 3
+#ifdef F_CPU
+#define PMW3360_SPI_DIVISOR (F_CPU / PMW3360_CLOCKS)
+#else
+#define PMW3360_SPI_DIVISOR (clock_get_hz(clk_sys) / PMW3360_CLOCKS)
+#endif
 #define PMW3360_CLOCKS 2000000
-#define PMW3360_SPI_PORT 0  // SPI0として固定
-#define PMW3360_SCK_PIN  18
-#define PMW3360_MOSI_PIN 19
-#define PMW3360_MISO_PIN 16
-#define PMW3360_CS_PIN   17
-#define PMW3360_SPI_BAUDRATE 2000000
 
 static bool motion_bursting = false;
 
-#include "my_gpio_spi_defs.h"  // 必要なレジスタ定義
-
 bool pmw3360_spi_start(void) {
-    rp2040_gpio_put(PMW3360_CS_PIN, 0);  // チップセレクトをアクティブに設定
-    return true;
+    return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
 }
-
-//void pmw3360_spi_stop(void) {
-//    rp2040_gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
-//}
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
-    rp2040_spi_write(addr & 0x7f);
-    rp2040_sleep_us(160);
-    uint8_t data = rp2040_spi_read();
-    rp2040_sleep_us(1);
-    pmw3360_spi_stop();
-    rp2040_sleep_us(19);
+    spi_write(addr & 0x7f);
+    wait_us(160);
+    uint8_t data = spi_read();
+    wait_us(1);
+    spi_stop();
+    wait_us(19);
+    // Reset motion_bursting mode if read from a register other than motion
+    // burst register.
+    if (addr != pmw3360_Motion_Burst) {
+        motion_bursting = false;
+    }
     return data;
 }
 
 void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     pmw3360_spi_start();
-    rp2040_spi_write(addr | 0x80);
-    rp2040_spi_write(data);
-    rp2040_sleep_us(35);
-    pmw3360_spi_stop();
-    rp2040_sleep_us(145);
+    spi_write(addr | 0x80);
+    spi_write(data);
+    wait_us(35);
+    spi_stop();
+    wait_us(145);
 }
 
 uint8_t pmw3360_cpi_get(void) {

@@ -133,7 +133,7 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     return true;
 }
 
-#include "print.h"  // デバッグ機能を使用するためのインクルード
+#include "oled_driver.h"  // 必要なヘッダーをインクルード
 
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);
@@ -164,9 +164,9 @@ bool pmw3360_init(void) {
     if (pid != 0x42 || rev != 0x01) {
         oled_write_ln("PMW3360 init fail", false);
         oled_write("PID: ", false);
-        oled_write_hex8(pid);
+        oled_write_hex(pid);  // ここを変更
         oled_write(" REV: ", false);
-        oled_write_hex8(rev);
+        oled_write_hex(rev);  // ここを変更
         return false;
     }
 

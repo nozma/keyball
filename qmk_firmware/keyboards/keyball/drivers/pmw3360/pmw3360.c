@@ -143,7 +143,9 @@ bool pmw3360_spi_test(void) {
     // テストレジスタに書き込み
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Config2, test_value);
+    wait_us(160);
     pmw3360_spi_stop();
+    wait_us(160);
 
     // 読み取り
     pmw3360_spi_start();

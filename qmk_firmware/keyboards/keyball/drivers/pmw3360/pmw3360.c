@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
-#include "my_gpio_spi_defs.h"
 
 // Include SROM definitions.
 #include "srom_0x04.c"
@@ -25,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define PMW3360_SPI_MODE 3
 #define PMW3360_CLOCKS 2000000
-#define PMW3360_SPI_PORT spi0
+#define PMW3360_SPI_PORT 0  // SPI0として固定
 #define PMW3360_SCK_PIN  18
 #define PMW3360_MOSI_PIN 19
 #define PMW3360_MISO_PIN 16
@@ -34,34 +33,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static bool motion_bursting = false;
 
+#include "my_gpio_spi_defs.h"  // 必要なレジスタ定義
+
 bool pmw3360_spi_start(void) {
-    spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
-    gpio_set_function(PMW3360_SCK_PIN, GPIO_FUNC_SPI);
-    gpio_set_function(PMW3360_MOSI_PIN, GPIO_FUNC_SPI);
-    gpio_set_function(PMW3360_MISO_PIN, GPIO_FUNC_SPI);
-    gpio_init(PMW3360_CS_PIN);
-    gpio_set_dir(PMW3360_CS_PIN, GPIO_OUT);
-    gpio_put(PMW3360_CS_PIN, 1);
+    // SPIとGPIOの初期化を直接レジスタ操作で実装
+    rp2040_gpio_set_function(PMW3360_SCK_PIN, 1);  // 1: SPI機能を設定
+    rp2040_gpio_set_function(PMW3360_MOSI_PIN, 1);
+    rp2040_gpio_set_function(PMW3360_MISO_PIN, 1);
+    rp2040_gpio_set_dir(PMW3360_CS_PIN, 1);  // 1: 出力方向に設定
+    rp2040_gpio_put(PMW3360_CS_PIN, 1);      // チップセレクトを非アクティブに設定
 
-    spi_set_format(PMW3360_SPI_PORT, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
-
-    gpio_put(PMW3360_CS_PIN, 0);
+    rp2040_gpio_put(PMW3360_CS_PIN, 0);  // チップセレクトをアクティブに設定
     return true;
 }
 
 void pmw3360_spi_stop(void) {
-    gpio_put(PMW3360_CS_PIN, 1);
+    rp2040_gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
-    spi_write_blocking(PMW3360_SPI_PORT, &addr, 1);
-    sleep_us(160);
-    uint8_t data;
-    spi_read_blocking(PMW3360_SPI_PORT, 0, &data, 1);
-    sleep_us(1);
+    rp2040_spi_write(addr & 0x7f);
+    rp2040_sleep_us(160);
+    uint8_t data = rp2040_spi_read();
+    rp2040_sleep_us(1);
     pmw3360_spi_stop();
-    sleep_us(19);
+    rp2040_sleep_us(19);
 
     if (addr != pmw3360_Motion_Burst) {
         motion_bursting = false;
@@ -71,11 +68,11 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
 
 void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     pmw3360_spi_start();
-    uint8_t command[] = { addr | 0x80, data };
-    spi_write_blocking(PMW3360_SPI_PORT, command, 2);
-    sleep_us(35);
+    rp2040_spi_write(addr | 0x80);
+    rp2040_spi_write(data);
+    rp2040_sleep_us(35);
     pmw3360_spi_stop();
-    sleep_us(145);
+    rp2040_sleep_us(145);
 }
 
 uint8_t pmw3360_cpi_get(void) {

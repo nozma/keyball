@@ -106,24 +106,18 @@ uint32_t pmw3360_scan_rate_get(void) {
 }
 
 bool pmw3360_motion_read(pmw3360_motion_t *d) {
-#ifdef DEBUG_PMW3360_SCAN_RATE
-    pmw3360_scan_perf_task();
-#endif
     uint8_t mot = pmw3360_reg_read(pmw3360_Motion);
-    if ((mot & 0x88) != 0x80) {
+    if ((mot & 0x80) == 0) {
         return false;
     }
-    d->y = pmw3360_reg_read(pmw3360_Delta_X_L);
-    d->y |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
-    d->x = pmw3360_reg_read(pmw3360_Delta_Y_L);
-    d->x |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
+    d->x = pmw3360_reg_read(pmw3360_Delta_X_L);
+    d->x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
+    d->y = pmw3360_reg_read(pmw3360_Delta_Y_L);
+    d->y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
     return true;
 }
 
 bool pmw3360_motion_burst(pmw3360_motion_t *d) {
-#ifdef DEBUG_PMW3360_SCAN_RATE
-    pmw3360_scan_perf_task();
-#endif
     if (!motion_bursting) {
         pmw3360_reg_write(pmw3360_Motion_Burst, 0);
         motion_bursting = true;
@@ -134,10 +128,10 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     wait_us(35);
     pmw3360_spi_read(); // skip MOT
     pmw3360_spi_read(); // skip Observation
-    d->y = pmw3360_spi_read();
-    d->y |= pmw3360_spi_read() << 8;
     d->x = pmw3360_spi_read();
     d->x |= pmw3360_spi_read() << 8;
+    d->y = pmw3360_spi_read();
+    d->y |= pmw3360_spi_read() << 8;
     pmw3360_spi_stop();
     wait_us(1);
     return true;

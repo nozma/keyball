@@ -133,35 +133,39 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     return true;
 }
 
+#include "print.h"  // デバッグ機能を使用するためのインクルード
+
 bool pmw3360_init(void) {
+    print("Initializing PMW3360...\n");
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
-    // reboot
+    
+    // リセット
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
 
-    // read five registers of motion and discard those values
+    // モーションデータの読み捨て
     pmw3360_reg_read(pmw3360_Motion);
     pmw3360_reg_read(pmw3360_Delta_X_L);
     pmw3360_reg_read(pmw3360_Delta_X_H);
     pmw3360_reg_read(pmw3360_Delta_Y_L);
     pmw3360_reg_read(pmw3360_Delta_Y_H);
 
-    // configuration
+    // 設定
     pmw3360_reg_write(pmw3360_Config2, 0x00);
 
-    // check product ID and revision ID
+    // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     spi_stop();
 
     if (pid != 0x42 || rev != 0x01) {
-        // エラー発生時にデバッグメッセージを表示
         print("PMW3360 initialization failed: PID=");
-        print_hex(pid, 2);
+        print_hex8(pid);  // 修正点: print_hexからprint_hex8に変更
         print(" REV=");
-        print_hex(rev, 2);
+        print_hex8(rev);  // 修正点: print_hexからprint_hex8に変更
+        print("\n");
         return false;
     }
 

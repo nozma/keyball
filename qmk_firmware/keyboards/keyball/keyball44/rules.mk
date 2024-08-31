@@ -66,6 +66,7 @@ CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_gpio/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_clocks/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_base/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/common/pico_stdlib/include
+CFLAGS += -I$(PICO_SDK_PATH)/src/common/pico_stdio/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2040/hardware_regs/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2040/hardware_structs/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/boards/include

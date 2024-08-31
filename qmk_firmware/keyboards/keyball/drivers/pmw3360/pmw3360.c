@@ -35,6 +35,7 @@ void pmw3360_spi_init(void) {
 
 bool pmw3360_spi_start(void) {
     writePinLow(PMW3360_NCS_PIN);
+    return true;
 }
 
 void pmw3360_spi_stop(void) {

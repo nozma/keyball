@@ -36,7 +36,7 @@ void pmw3360_spi_init(void) {
 }
 
 bool pmw3360_spi_start(void) {
-    awritePinLow(PMW3360_NCS_PIN);
+    writePinLow(PMW3360_NCS_PIN);
     oled_write_ln("SPI Start", false);  // 追加: SPI開始ログ
     return true;
 }

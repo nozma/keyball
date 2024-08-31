@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static bool motion_bursting = false;
 
 bool pmw3360_spi_start(void) {
-    spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
+    pico_spi_init(PMW3360_SPI_PORT, PMW3360_SPI_BAUDRATE);
     gpio_set_function(PMW3360_SCK_PIN, GPIO_FUNC_SPI);
     gpio_set_function(PMW3360_MOSI_PIN, GPIO_FUNC_SPI);
     gpio_set_function(PMW3360_MISO_PIN, GPIO_FUNC_SPI);

@@ -27,48 +27,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static bool motion_bursting = false;
 
-void spi_init(void) {
-    // QMKのAPIでSPIを初期化
+void pmw3360_spi_init(void) {
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
-    writePinHigh(PMW3360_NCS_PIN);  // 初期状態をHighに
+    writePinHigh(PMW3360_NCS_PIN);
 }
 
 bool pmw3360_spi_start(void) {
-    writePinLow(PMW3360_NCS_PIN);  // CSをLowにして通信を開始
+    writePinLow(PMW3360_NCS_PIN);
     return true;
 }
 
 void pmw3360_spi_stop(void) {
-    writePinHigh(PMW3360_NCS_PIN);  // CSをHighにして通信を終了
+    writePinHigh(PMW3360_NCS_PIN);
 }
 
-void spi_write(uint8_t data) {
-    spi_write8(data);
+void pmw3360_spi_write(uint8_t data) {
+    spi_write(&data, 1);
 }
 
-uint8_t spi_read(void) {
-    return spi_read8();
-}
-
-void wait_us(uint32_t us) {
-    wait_us(us);
-}
-
-void wait_ms(uint32_t ms) {
-    wait_ms(ms);
+uint8_t pmw3360_spi_read(void) {
+    uint8_t data;
+    spi_read(&data, 1);
+    return data;
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
-    spi_write(addr & 0x7f);
+    pmw3360_spi_write(addr & 0x7f);
     wait_us(160);
-    uint8_t data = spi_read();
+    uint8_t data = pmw3360_spi_read();
     wait_us(1);
     pmw3360_spi_stop();
     wait_us(19);
-    // Reset motion_bursting mode if read from a register other than motion
-    // burst register.
     if (addr != pmw3360_Motion_Burst) {
         motion_bursting = false;
     }
@@ -77,8 +68,8 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
 
 void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     pmw3360_spi_start();
-    spi_write(addr | 0x80);
-    spi_write(data);
+    pmw3360_spi_write(addr | 0x80);
+    pmw3360_spi_write(data);
     wait_us(35);
     pmw3360_spi_stop();
     wait_us(145);
@@ -135,47 +126,40 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 #ifdef DEBUG_PMW3360_SCAN_RATE
     pmw3360_scan_perf_task();
 #endif
-    // Start motion burst if motion burst mode is not started.
     if (!motion_bursting) {
         pmw3360_reg_write(pmw3360_Motion_Burst, 0);
         motion_bursting = true;
     }
 
     pmw3360_spi_start();
-    spi_write(pmw3360_Motion_Burst);
+    pmw3360_spi_write(pmw3360_Motion_Burst);
     wait_us(35);
-    spi_read(); // skip MOT
-    spi_read(); // skip Observation
-    d->x = spi_read();
-    d->x |= spi_read() << 8;
-    d->y = spi_read();
-    d->y |= spi_read() << 8;
+    pmw3360_spi_read(); // skip MOT
+    pmw3360_spi_read(); // skip Observation
+    d->x = pmw3360_spi_read();
+    d->x |= pmw3360_spi_read() << 8;
+    d->y = pmw3360_spi_read();
+    d->y |= pmw3360_spi_read() << 8;
     pmw3360_spi_stop();
-    // Required NCS in 500ns after motion burst.
     wait_us(1);
     return true;
 }
 
 bool pmw3360_init(void) {
-    spi_init();
-    setPinOutput(PMW3360_NCS_PIN);
+    pmw3360_spi_init();
 
-    // センサーリセット
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
 
-    // モーションデータの読み捨て
     pmw3360_reg_read(pmw3360_Motion);
     pmw3360_reg_read(pmw3360_Delta_X_L);
     pmw3360_reg_read(pmw3360_Delta_X_H);
     pmw3360_reg_read(pmw3360_Delta_Y_L);
     pmw3360_reg_read(pmw3360_Delta_Y_H);
 
-    // センサー設定の初期化
     pmw3360_reg_write(pmw3360_Config2, 0x00);
 
-    // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     pmw3360_spi_stop();
@@ -191,13 +175,12 @@ void pmw3360_srom_upload(pmw3360_srom_t srom) {
     wait_us(10);
     pmw3360_reg_write(pmw3360_SROM_Enable, 0x18);
 
-    // SROM upload (download for PMW3360) with burst mode
     pmw3360_spi_start();
-    spi_write(pmw3360_SROM_Load_Burst | 0x80);
+    pmw3360_spi_write(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
     for (size_t i = 0; i < srom.len; i++) {
         uint8_t byte = pgm_read_byte(srom.data + i);
-        spi_write(byte);
+        pmw3360_spi_write(byte);
         wait_us(15);
     }
     pmw3360_spi_stop();

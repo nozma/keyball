@@ -120,7 +120,7 @@ extern const pmw3360_srom_t pmw3360_srom_0x81;
 /// It will return true when succeeded, otherwise false.
 bool pmw3360_init(void);
 
-void pmw3360_srom_upload(pmw3360_srom_t srom);
+void pmw3360_srom_upload(const pmw3360_srom_t *srom);
 
 /// pmw3360_motion_read gets a motion data by Motion register.
 /// This requires to write a dummy data to pmw3360_Motion register

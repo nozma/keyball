@@ -225,7 +225,8 @@ bool pmw3360_init(void) {
 }
 
 uint8_t pmw3360_srom_id = 0;
-
+// pmw3360.h 内の宣言の修正（ポインタ渡し）
+void pmw3360_srom_upload(const pmw3360_srom_t *srom);
 // pmw3360_srom_upload 関数を以下のように修正
 void pmw3360_srom_upload(const pmw3360_srom_t *srom) {
     pmw3360_reg_write(pmw3360_Config2, 0x00);

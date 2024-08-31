@@ -30,8 +30,8 @@ void pointing_device_driver_init(void) {
 report_mouse_t pointing_device_driver_get_report(report_mouse_t mouse_report) {
     pmw3360_motion_t d = {0};
     if (pmw3360_has && pmw3360_motion_burst(&d)) {
-        mouse_report.x = constrain_hid(d.y);
-        mouse_report.y = constrain_hid(d.x);
+        mouse_report.y = constrain_hid(d.y);
+        mouse_report.x = constrain_hid(d.x);
     }
     return mouse_report;
 }

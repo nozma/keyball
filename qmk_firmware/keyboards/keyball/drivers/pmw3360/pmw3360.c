@@ -134,27 +134,39 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 }
 
 bool pmw3360_init(void) {
-    oled_write_ln_P(PSTR("Initializing PMW3360"), false); // debug
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
     // reboot
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
+
     // read five registers of motion and discard those values
     pmw3360_reg_read(pmw3360_Motion);
     pmw3360_reg_read(pmw3360_Delta_X_L);
     pmw3360_reg_read(pmw3360_Delta_X_H);
     pmw3360_reg_read(pmw3360_Delta_Y_L);
     pmw3360_reg_read(pmw3360_Delta_Y_H);
+
     // configuration
     pmw3360_reg_write(pmw3360_Config2, 0x00);
+
     // check product ID and revision ID
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     spi_stop();
-    oled_write_ln_P(PSTR("Initializing PMW3360"), false); //debug
-    return pid == 0x42 && rev == 0x01;
+
+    if (pid != 0x42 || rev != 0x01) {
+        // エラー発生時にデバッグメッセージを表示
+        print("PMW3360 initialization failed: PID=");
+        print_hex(pid, 2);
+        print(" REV=");
+        print_hex(rev, 2);
+        return false;
+    }
+
+    print("PMW3360 initialized successfully.\n");
+    return true;
 }
 
 uint8_t pmw3360_srom_id = 0;

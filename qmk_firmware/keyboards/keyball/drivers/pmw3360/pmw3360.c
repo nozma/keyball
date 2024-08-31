@@ -226,7 +226,8 @@ bool pmw3360_init(void) {
 
 uint8_t pmw3360_srom_id = 0;
 
-void pmw3360_srom_upload(void) {
+// pmw3360_srom_upload 関数を以下のように修正
+void pmw3360_srom_upload(const pmw3360_srom_t *srom) {
     pmw3360_reg_write(pmw3360_Config2, 0x00);
     pmw3360_reg_write(pmw3360_SROM_Enable, 0x1D);
     wait_us(10);
@@ -236,8 +237,8 @@ void pmw3360_srom_upload(void) {
     spi_write(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
 
-    for (size_t i = 0; i < pmw3360_srom_0x04.len; i++) {
-        spi_write(pgm_read_byte(&pmw3360_srom_0x04.data[i]));
+    for (size_t i = 0; i < srom->len; i++) {
+        spi_write(pgm_read_byte(&srom->data[i]));
         wait_us(15);
     }
 

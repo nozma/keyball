@@ -163,14 +163,13 @@ bool pmw3360_spi_test(void) {
     return test_value == read_value;
 }
 
-if (!pmw3360_spi_test()) {
-    oled_write_ln("SPI Test Failed", false);
-    return false;
-}
-
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);
     spi_init();
+        if (!pmw3360_spi_test()) {
+        oled_write_ln("SPI Test Failed", false);
+        return false;
+    }
     setPinOutput(PMW3360_NCS_PIN);
 
     // リセット

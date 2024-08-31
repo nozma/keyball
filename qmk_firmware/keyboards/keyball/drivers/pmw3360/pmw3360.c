@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
-//#include "oled_driver.h"  // OLED表示用のヘッダーを追加
+#include "oled_driver.h"  // OLED表示用のヘッダーを追加
 
 // Include SROM definitions.
 #include "srom_0x04.c"
@@ -154,6 +154,12 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 
 bool pmw3360_init(void) {
     pmw3360_spi_init();
+
+    // OLEDの動作確認
+    oled_clear();
+    oled_write_ln("PMW3360 Init", false);
+    oled_render();
+    wait_ms(1000);  // 1秒間待機して表示を確認
 
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);

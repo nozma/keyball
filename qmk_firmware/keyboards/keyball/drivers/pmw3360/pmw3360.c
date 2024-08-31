@@ -33,9 +33,8 @@ void pmw3360_spi_init(void) {
     writePinHigh(PMW3360_NCS_PIN);
 }
 
-bool pmw3360_spi_start(void) {
+void pmw3360_spi_start(void) {
     writePinLow(PMW3360_NCS_PIN);
-    return true;
 }
 
 void pmw3360_spi_stop(void) {
@@ -43,13 +42,11 @@ void pmw3360_spi_stop(void) {
 }
 
 void pmw3360_spi_write(uint8_t data) {
-    spi_write(&data, 1);
+    spi_write(data);  // 修正：元のspi_write関数を使用
 }
 
 uint8_t pmw3360_spi_read(void) {
-    uint8_t data;
-    spi_read(&data, 1);
-    return data;
+    return spi_read();  // 修正：元のspi_read関数を使用
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {

@@ -163,12 +163,14 @@ bool pmw3360_spi_test(void) {
     return test_value == read_value;
 }
 
-//#include "spi.h"  // 必要なSPI関連のヘッダーをインクルード
+#include "spi_master.h"  // QMKのSPI通信関連のヘッダー
 
 void spi_init(void) {
-    // SPIモードとクロック速度を設定
-    spi_set_format(SPI_PORT, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);  // SPIモード3を設定
-    spi_set_baudrate(SPI_PORT, 250000);  // 250kHzにクロックを設定
+    // SPIの初期化。spi_master_init()を使用してQMK標準の初期化を行う。
+    spi_master_init();
+    
+    // SPI速度を設定
+    spi_master_setspeed(250000);  // 250kHzに設定
 
     // 他の初期化処理が必要ならここに追加
 }

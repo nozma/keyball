@@ -59,9 +59,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define I2C1_SDA_PIN GP2
 #define I2C1_SCL_PIN GP3
 
-#define SPI_SCK_PIN GP6
-#define SPI_MOSI_PIN GP3
-#define SPI_MISO_PIN GP4
-#define PMW33XX_CS_PIN GP5 // SPI CS pin.
+#define SPI_SCK_PIN GP10
+#define SPI_MOSI_PIN GP11
+#define SPI_MISO_PIN GP12
+#define PMW33XX_CS_PIN GP13 // SPI CS pin.
 #define PMW33XX_CPI 1600 // CPI設定
 #define PMW33XX_CLOCK_SPEED 2000000 // クロック速度の設定

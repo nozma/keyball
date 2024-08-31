@@ -65,6 +65,8 @@ CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_spi/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_gpio/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/rp2_common/hardware_clocks/include
 CFLAGS += -I$(PICO_SDK_PATH)/src/common/pico_stdlib/include
+CFLAGS += -I$(PICO_SDK_PATH)/src/rp2040/hardware_regs/include
+CFLAGS += -I$(PICO_SDK_PATH)/src/rp2040/hardware_structs/include
 
 # 必要なPico SDKのライブラリをリンク
 LDFLAGS += -L$(PICO_SDK_PATH)/build/lib

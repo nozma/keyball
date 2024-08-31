@@ -133,7 +133,8 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     return true;
 }
 
-#include "oled_driver.h"  // 必要なヘッダーをインクルード
+#include "oled_driver.h"
+#include "stdio.h"  // 数値を文字列に変換するために使用
 
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);
@@ -160,13 +161,18 @@ bool pmw3360_init(void) {
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     spi_stop();
 
+    // 16進数の値を表示するためのバッファ
+    char buffer[8];
+
     // デバッグ情報をOLEDに表示
     if (pid != 0x42 || rev != 0x01) {
         oled_write_ln("PMW3360 init fail", false);
         oled_write("PID: ", false);
-        oled_write_hex(pid);  // ここを変更
+        snprintf(buffer, sizeof(buffer), "%02X", pid);
+        oled_write(buffer, false);
         oled_write(" REV: ", false);
-        oled_write_hex(rev);  // ここを変更
+        snprintf(buffer, sizeof(buffer), "%02X", rev);
+        oled_write(buffer, false);
         return false;
     }
 

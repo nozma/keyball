@@ -176,7 +176,7 @@ void spi_init(void) {
 bool pmw3360_init(void) {
     oled_write_ln("Init PMW3360", false);
     spi_init();
-        if (!spl_loopback_test()) {
+        if (!spi_loopback_test()) {
         oled_write_ln("SPI Test Failed", false);
         return false;
     }

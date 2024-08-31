@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 #include "pmw3360.h"
+#include "oled_driver.h"  // OLED表示用のヘッダーを追加
 
 // Include SROM definitions.
 #include "srom_0x04.c"
@@ -110,13 +111,17 @@ bool pmw3360_motion_read(pmw3360_motion_t *d) {
     if ((mot & 0x88) != 0x80) {
         return false;
     }
-    int16_t temp_x = pmw3360_reg_read(pmw3360_Delta_X_L);
-    temp_x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
-    int16_t temp_y = pmw3360_reg_read(pmw3360_Delta_Y_L);
-    temp_y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
+    d->x = pmw3360_reg_read(pmw3360_Delta_X_L);
+    d->x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
+    d->y = pmw3360_reg_read(pmw3360_Delta_Y_L);
+    d->y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
 
-    d->x = temp_y;
-    d->y = -temp_x;
+    // デバッグ情報をOLEDに表示
+    char buf[32];
+    snprintf(buf, sizeof(buf), "X: %d, Y: %d", d->x, d->y);
+    oled_clear();
+    oled_write_ln(buf, false);
+
     return true;
 }
 
@@ -127,15 +132,19 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     wait_us(35);
     pmw3360_spi_read(); // skip MOT
     pmw3360_spi_read(); // skip Observation
-    int16_t temp_x = pmw3360_spi_read();
-    temp_x |= pmw3360_spi_read() << 8;
-    int16_t temp_y = pmw3360_spi_read();
-    temp_y |= pmw3360_spi_read() << 8;
-
-    d->x = temp_y;
-    d->y = -temp_x;
+    d->x = pmw3360_spi_read();
+    d->x |= pmw3360_spi_read() << 8;
+    d->y = pmw3360_spi_read();
+    d->y |= pmw3360_spi_read() << 8;
     pmw3360_spi_stop();
     wait_us(1);
+
+    // デバッグ情報をOLEDに表示
+    char buf[32];
+    snprintf(buf, sizeof(buf), "Burst X: %d, Y: %d", d->x, d->y);
+    oled_clear();
+    oled_write_ln(buf, false);
+
     return true;
 }
 

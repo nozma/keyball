@@ -243,4 +243,4 @@ void pmw3360_srom_upload(const pmw3360_srom_t *srom) {
 
     spi_stop();
     wait_us(200);
-}s
+}

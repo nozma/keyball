@@ -121,6 +121,7 @@ bool pmw3360_motion_read(pmw3360_motion_t *d) {
     snprintf(buf, sizeof(buf), "X: %d, Y: %d", d->x, d->y);
     oled_clear();
     oled_write_ln(buf, false);
+    oled_render();
 
     return true;
 }
@@ -144,12 +145,14 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     snprintf(buf, sizeof(buf), "Burst X: %d, Y: %d", d->x, d->y);
     oled_clear();
     oled_write_ln(buf, false);
+    oled_render();
 
     return true;
 }
 
 bool pmw3360_init(void) {
     pmw3360_spi_init();
+    oled_write_ln("SPI init", false);
 
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);

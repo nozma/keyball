@@ -143,9 +143,9 @@ bool pmw3360_spi_test(void) {
     // テストレジスタに書き込み
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Config2, test_value);
-    wait_us(160);
+    wait_us(200);
     pmw3360_spi_stop();
-    wait_us(160);
+    wait_us(200);
 
     // 読み取り
     pmw3360_spi_start();
@@ -171,8 +171,8 @@ void spi_init(void) {
     // SPI設定
     pin_t slavePin = PMW3360_NCS_PIN;  // 使用しているチップセレクトピン
     bool lsbFirst = false;  // MSBファーストで通信
-    uint8_t mode = 0;  // SPIモード3 (CPOL=1, CPHA=1)
-    uint16_t divisor = 32;  // 分周値 (例えば、クロック速度を設定)
+    uint8_t mode = 3;  // SPIモード3 (CPOL=1, CPHA=1)
+    uint16_t divisor = 64;  // 分周値 (例えば、クロック速度を設定)
 
     // SPI通信を開始
     if (!spi_start(slavePin, lsbFirst, mode, divisor)) {

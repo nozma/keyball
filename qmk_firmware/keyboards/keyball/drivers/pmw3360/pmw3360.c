@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
 
+// spi_initを別の名前にエイリアス
+#define pico_spi_init spi_init
+
 // Include SROM definitions.
 #include "srom_0x04.c"
 #include "srom_0x81.c"
@@ -152,7 +155,7 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 }
 
 bool pmw3360_init(void) {
-    spi_init();
+    pico_spi_init();
     setPinOutput(PMW3360_NCS_PIN);
     // reboot
     pmw3360_spi_start();

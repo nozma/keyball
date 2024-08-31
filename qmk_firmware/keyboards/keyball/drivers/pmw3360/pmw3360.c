@@ -207,7 +207,7 @@ bool pmw3360_init(void) {
     pmw3360_reg_write(pmw3360_Config2, 0x00);
 
     // SROMのアップロード (選択したSROMを渡す)
-    pmw3360_srom_upload(&pmw3360_srom_0x81);  // 例えば 0x81 の SROM を使用する場合
+    pmw3360_srom_upload(pmw3360_srom_0x81);  // 例えば 0x81 の SROM を使用する場合
 
     // プロダクトIDとリビジョンIDの確認
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);

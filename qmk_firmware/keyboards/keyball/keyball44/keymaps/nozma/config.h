@@ -58,3 +58,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define I2C_DRIVER I2CD1
 #define I2C1_SDA_PIN GP2
 #define I2C1_SCL_PIN GP3
+
+#define SPI_SCK_PIN GP22
+#define SPI_MOSI_PIN GP23
+#define SPI_MISO_PIN GP20
+#define PMW33XX_CS_PIN GP21 // SPI CS pin.

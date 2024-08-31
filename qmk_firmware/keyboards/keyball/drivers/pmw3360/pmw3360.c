@@ -47,9 +47,9 @@ bool pmw3360_spi_start(void) {
     return true;
 }
 
-void pmw3360_spi_stop(void) {
-    rp2040_gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
-}
+//void pmw3360_spi_stop(void) {
+//    rp2040_gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
+//}
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();

@@ -175,7 +175,6 @@ bool pmw3360_spi_test(void) {
 
     if (test_value != read_value) {
         oled_write_ln("SPI Test Failed", false);  // 既存のログ
-        oled_write("Check wiring, mode, and clock.", false);  // 追加: エラー説明
         return false;
     }
     

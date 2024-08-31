@@ -35,13 +35,14 @@ static bool motion_bursting = false;
 
 #include "my_gpio_spi_defs.h"  // 必要なレジスタ定義
 
-void pmw3360_spi_start(void) {
+bool pmw3360_spi_start(void) {
     rp2040_gpio_put(PMW3360_CS_PIN, 0);  // チップセレクトをアクティブに設定
+    return true;
 }
 
-void pmw3360_spi_stop(void) {
-    rp2040_gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
-}
+//void pmw3360_spi_stop(void) {
+//    rp2040_gpio_put(PMW3360_CS_PIN, 1);  // チップセレクトを非アクティブに設定
+//}
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();

@@ -169,8 +169,8 @@ void spi_init(void) {
     // SPI設定
     pin_t slavePin = PMW3360_NCS_PIN;  // 使用しているチップセレクトピン
     bool lsbFirst = false;  // MSBファーストで通信
-    uint8_t mode = 3;  // SPIモード3 (CPOL=1, CPHA=1)
-    uint16_t divisor = 16;  // 分周値 (例えば、クロック速度を設定)
+    uint8_t mode = 0;  // SPIモード3 (CPOL=1, CPHA=1)
+    uint16_t divisor = 32;  // 分周値 (例えば、クロック速度を設定)
 
     // SPI通信を開始
     if (!spi_start(slavePin, lsbFirst, mode, divisor)) {

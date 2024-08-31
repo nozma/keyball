@@ -110,13 +110,13 @@ bool pmw3360_motion_read(pmw3360_motion_t *d) {
     pmw3360_scan_perf_task();
 #endif
     uint8_t mot = pmw3360_reg_read(pmw3360_Motion);
-    if ((mot & 0x88) != 0x80) {
+    if ((mot & 0x80) == 0) {
         return false;
     }
-    d->x = pmw3360_reg_read(pmw3360_Delta_X_L);
-    d->x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
-    d->y = pmw3360_reg_read(pmw3360_Delta_Y_L);
-    d->y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
+    d->y = pmw3360_reg_read(pmw3360_Delta_X_L);
+    d->y |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
+    d->x = pmw3360_reg_read(pmw3360_Delta_Y_L);
+    d->x |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
     return true;
 }
 

@@ -59,4 +59,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define I2C1_SDA_PIN GP2
 #define I2C1_SCL_PIN GP3
 
-#define PICO_CLOCK_SYS 125000000 // 125 MHz

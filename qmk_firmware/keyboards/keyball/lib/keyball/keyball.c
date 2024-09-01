@@ -190,10 +190,10 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
     int16_t div = 1 << (keyball_get_scroll_div() - 1);
     int16_t x = divmod16(&m->x, div);
     int16_t y = divmod16(&m->y, div);
-     oled_write_ln("motion to mouse scroll", false);
-     oled_write_ln(KEYBALL_MODEL, false);
+    oled_write_ln("motion to mouse scroll", false);
     // apply to mouse report.
 #if KEYBALL_MODEL == 61 || KEYBALL_MODEL == 39 || KEYBALL_MODEL == 147 || KEYBALL_MODEL == 44
+    oled_write_ln("model44?", false);
     r->h = clip2int8(y);
     r->v = -clip2int8(x);
     if (is_left) {

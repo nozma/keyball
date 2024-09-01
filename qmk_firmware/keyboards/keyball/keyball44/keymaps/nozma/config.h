@@ -64,8 +64,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SPI_MOSI_PIN GP23
 #define SPI_MISO_PIN GP20
 #define PMW33XX_CS_PIN GP21 // SPI CS pin.
-#define POINTING_DEVICE_INVERT_Y
-#define POINTING_DEVICE_ROTATION_270
+//#define POINTING_DEVICE_INVERT_Y
+//#define POINTING_DEVICE_ROTATION_270
 
 /* Optional. */
 #define PMW33XX_CPI 1600      // The CPI range is 100-12000, in increments of 100. Defaults to 1600 CPI.

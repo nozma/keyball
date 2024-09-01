@@ -141,7 +141,6 @@ void keyboard_pre_init_kb(void) {
 #endif
 
 void pointing_device_driver_init(void) {
-    oled_write_ln("pointing device driver init", false); // 追加
 #if KEYBALL_MODEL != 46
     keyball.this_have_ball = pmw3360_init();
 #endif
@@ -270,7 +269,6 @@ static inline bool should_report(void) {
 
 report_mouse_t pointing_device_driver_get_report(report_mouse_t rep) {
     // fetch from optical sensor.
-    oled_write_ln("get report", false);
     if (keyball.this_have_ball) {
         pmw3360_motion_t d = {0};
         if (pmw3360_motion_burst(&d)) {

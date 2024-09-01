@@ -146,10 +146,20 @@ static void print_scroll_status(void) {
     oled_write_raw_P(keyball.scroll_mode ? img_scroll_down : img_scroll_no, sizeof(img_scroll_no));
 }
 
+// LEDステータス表示
+static void print_led_status(void) {
+    oled_set_cursor(0, 6);
+    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
+    oled_write_P(PSTR("spd "), false);
+    oled_write(itoc(rgblight_get_speed(), 0), false);
+    oled_write_P(PSTR("mo"), false);
+    oled_write(itoc(rgblight_get_mode(), 3), false);
+}
+
 // デフォルトページ表示
 static void render_default(void) {
     print_cpi_status();
-    print_lock_key_status();
+    print_led_status();
     print_layer_status();
     print_scroll_status();
 }

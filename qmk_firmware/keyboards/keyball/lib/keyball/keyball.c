@@ -237,7 +237,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
 }
 
 static void motion_to_mouse(keyball_motion_t *m, report_mouse_t *r, bool is_left, bool as_scroll) {
-    oled_write_ln("motion to mouse", false);
+    //oled_write_ln("motion to mouse", false);
     if (as_scroll) {
         oled_write_ln("as scroll on", false);
         keyball_on_apply_motion_to_mouse_scroll(m, r, is_left);

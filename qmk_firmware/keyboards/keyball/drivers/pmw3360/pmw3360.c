@@ -34,21 +34,22 @@ void pmw3360_spi_init(void) {
 }
 
 bool pmw3360_spi_start(void) {
-    writePinLow(PMW3360_NCS_PIN);
-    return true;
+    //writePinLow(PMW3360_NCS_PIN);
+    //return true;
+    return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
 }
 
-void pmw3360_spi_stop(void) {
-    writePinHigh(PMW3360_NCS_PIN);
-}
+//void pmw3360_spi_stop(void) {
+//    writePinHigh(PMW3360_NCS_PIN);
+//}
 
-void pmw3360_spi_write(uint8_t data) {
-    spi_write(data);  // 修正：元のspi_write関数を使用
-}
+//void pmw3360_spi_write(uint8_t data) {
+//    spi_write(data);  // 修正：元のspi_write関数を使用
+//}
 
-uint8_t pmw3360_spi_read(void) {
-    return spi_read();  // 修正：元のspi_read関数を使用
-}
+//uint8_t pmw3360_spi_read(void) {
+//    return spi_read();  // 修正：元のspi_read関数を使用
+//}
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
@@ -56,7 +57,7 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
     wait_us(160);
     uint8_t data = pmw3360_spi_read();
     wait_us(1);
-    pmw3360_spi_stop();
+    spi_stop();
     wait_us(19);
     if (addr != pmw3360_Motion_Burst) {
         motion_bursting = false;
@@ -66,10 +67,10 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
 
 void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     pmw3360_spi_start();
-    pmw3360_spi_write(addr | 0x80);
-    pmw3360_spi_write(data);
+    spi_write(addr | 0x80);
+    spi_write(data);
     wait_us(35);
-    pmw3360_spi_stop();
+    spi_stop();
     wait_us(145);
 }
 
@@ -130,22 +131,23 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     }
 
     pmw3360_spi_start();
-    pmw3360_spi_write(pmw3360_Motion_Burst);
+    spi_write(pmw3360_Motion_Burst);
     wait_us(35);
-    pmw3360_spi_read(); // skip MOT
-    pmw3360_spi_read(); // skip Observation
-    d->y = pmw3360_spi_read();
-    d->y |= pmw3360_spi_read() << 8;
-    d->x = pmw3360_spi_read();
-    d->x |= pmw3360_spi_read() << 8;
-    pmw3360_spi_stop();
+    spi_read(); // skip MOT
+    spi_read(); // skip Observation
+    d->y = spi_read();
+    d->y |= spi_read() << 8;
+    d->x = spi_read();
+    d->x |= spi_read() << 8;
+    spi_stop();
     wait_us(1);
     return true;
 }
 
 bool pmw3360_init(void) {
-    pmw3360_spi_init();
-
+    spi_init();
+    setPinOutput(PMW3360_NCS_PIN);
+    // reboot
     pmw3360_spi_start();
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
@@ -160,7 +162,7 @@ bool pmw3360_init(void) {
 
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
-    pmw3360_spi_stop();
+    spi_stop();
 
     return pid == 0x42 && rev == 0x01;
 }
@@ -174,14 +176,14 @@ void pmw3360_srom_upload(pmw3360_srom_t srom) {
     pmw3360_reg_write(pmw3360_SROM_Enable, 0x18);
 
     pmw3360_spi_start();
-    pmw3360_spi_write(pmw3360_SROM_Load_Burst | 0x80);
+    spi_write(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
     for (size_t i = 0; i < srom.len; i++) {
         uint8_t byte = pgm_read_byte(srom.data + i);
         pmw3360_spi_write(byte);
         wait_us(15);
     }
-    pmw3360_spi_stop();
+    spi_stop();
     wait_us(200);
 
     pmw3360_srom_id = pmw3360_reg_read(pmw3360_SROM_ID);

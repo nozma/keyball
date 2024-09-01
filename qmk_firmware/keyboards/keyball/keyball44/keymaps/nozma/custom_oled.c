@@ -138,7 +138,7 @@ static void print_scroll_status(void) {
 
 // LEDステータス表示
 static void print_led_status(void) {
-    oled_set_cursor(0, 2);
+    oled_set_cursor(0, 5);
     oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
     oled_write_P(PSTR("spd "), false);
     oled_write(itoc(rgblight_get_speed(), 0), false);

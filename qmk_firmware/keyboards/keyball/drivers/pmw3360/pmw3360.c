@@ -35,26 +35,12 @@ void pmw3360_spi_init(void) {
 }
 
 bool pmw3360_spi_start(void) {
-    //writePinLow(PMW3360_NCS_PIN);
-    //return true;
     return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
 }
 
-//void pmw3360_spi_stop(void) {
-//    writePinHigh(PMW3360_NCS_PIN);
-//}
-
-//void pmw3360_spi_write(uint8_t data) {
-//    spi_write(data);  // 修正：元のspi_write関数を使用
-//}
-
-//uint8_t pmw3360_spi_read(void) {
-//    return spi_read();  // 修正：元のspi_read関数を使用
-//}
-
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
-    pmw3360_spi_write(addr & 0x7f);
+    spi_write(addr & 0x7f);
     wait_us(160);
     uint8_t data = pmw3360_spi_read();
     wait_us(1);
@@ -115,10 +101,10 @@ bool pmw3360_motion_read(pmw3360_motion_t *d) {
     if ((mot & 0x88) != 0x80) {
         return false;
     }
-    d->y = pmw3360_reg_read(pmw3360_Delta_X_L);
-    d->y |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
-    d->x = pmw3360_reg_read(pmw3360_Delta_Y_L);
-    d->x |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
+    d->y = pmw3360_reg_read(pmw3360_Delta_Y_L);
+    d->y |= pmw3360_reg_read(pmw3360_Delta_Y_H) << 8;
+    d->x = pmw3360_reg_read(pmw3360_Delta_X_L);
+    d->x |= pmw3360_reg_read(pmw3360_Delta_X_H) << 8;
     return true;
 }
 

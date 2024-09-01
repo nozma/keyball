@@ -373,6 +373,11 @@ static const char PROGMEM tap_minimal[TAP_FRAMES][ANIM_SIZE] =
     }
 };
 
+static unsigned int type_count = 0;
+void count_type(void) {
+    type_count++;
+}
+
 bool detect_key_down(void)
 {
     // store the previous cycle's cache
@@ -411,6 +416,11 @@ bool detect_key_down(void)
             return true;
         }
     }
+#ifdef OLED_ENABLE
+    if (record->event.pressed) {
+        count_type();
+    }
+#endif
     return false;
 }
 
@@ -493,10 +503,12 @@ static void draw_bongo(bool minimal)
 
     if (!minimal)
     {
-        // print wpm
+        // print type count
+        static char type_count_str[7];
         oled_set_cursor(0, 0);
-        sprintf(wpm, "WPM:%03d", get_current_wpm());
-        oled_write(wpm, false);
+        oled_write_P(PSTR("type:"), false);
+        itoa(type_count, type_count_str, 10);
+        oled_write(type_count_str, false);
 
         // calculate && print clock
         //oled_set_cursor(0, 2);

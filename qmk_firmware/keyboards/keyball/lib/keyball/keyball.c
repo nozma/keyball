@@ -522,12 +522,6 @@ bool keyball_get_scroll_mode(void) {
 }
 
 void keyball_set_scroll_mode(bool mode) {
-    // デバッグ用
-    if (mode) {
-        oled_write_ln("Scroll Mode: ON", false);
-    } else {
-        oled_write_ln("Scroll Mode: OFF", false);
-    }
     if (mode != keyball.scroll_mode) {
         keyball.scroll_mode_changed = timer_read32();
     }

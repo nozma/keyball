@@ -377,6 +377,14 @@ static unsigned int type_count = 0;
 void count_type(void) {
     type_count++;
 }
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef OLED_ENABLE
+    if (record->event.pressed) {
+        count_type();
+    }
+#endif
+    return true;
+}
 
 bool detect_key_down(void)
 {
@@ -416,11 +424,7 @@ bool detect_key_down(void)
             return true;
         }
     }
-#ifdef OLED_ENABLE
-    if (record->event.pressed) {
-        count_type();
-    }
-#endif
+
     return false;
 }
 

@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 // DEBUG_PMW3360_SCAN_RATE enables scan performance counter.
-#define DEBUG_PMW3360_SCAN_RATE
+//#define DEBUG_PMW3360_SCAN_RATE
 
 //////////////////////////////////////////////////////////////////////////////
 // Types
@@ -139,8 +139,16 @@ uint8_t pmw3360_reg_read(uint8_t addr);
 
 bool pmw3360_spi_start(void);
 
-void pmw3360_spi_stop(void);
+void inline pmw3360_spi_stop(void) {
+    spi_stop();
+}
 
-void pmw3360_spi_write(uint8_t data);
+/// \deprecated use pmw3360_reg_write() instead of this.
+spi_status_t inline pmw3360_spi_write(uint8_t data) {
+    return spi_write(data);
+}
 
-uint8_t pmw3360_spi_read(void);
+/// \deprecated use pmw3360_reg_read() instead of this.
+spi_status_t inline pmw3360_spi_read(void) {
+    return spi_read();
+}

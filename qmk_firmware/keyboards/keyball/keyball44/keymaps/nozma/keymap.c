@@ -85,7 +85,7 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         keyball_oled_render_mymain();
     } else {
-        draw_bongo(true);
+        draw_bongo(false);
     }
     return true;
 }

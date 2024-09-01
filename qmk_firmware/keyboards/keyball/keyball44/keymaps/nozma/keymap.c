@@ -77,7 +77,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 // メイン、サブの判定
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-        keyball_oled_render_mymain();
+        //keyball_oled_render_mymain();
     } else {
         draw_bongo(true);
     }

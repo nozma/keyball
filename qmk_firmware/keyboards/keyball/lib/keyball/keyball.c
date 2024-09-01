@@ -48,7 +48,7 @@ keyball_t keyball = {
     .cpi_value   = 0,
     .cpi_changed = false,
 
-    .scroll_mode = false,
+    .scroll_mode = true,
     .scroll_div  = 0,
 
     .pressing_keys = { BL, BL, BL, BL, BL, BL, 0 },
@@ -190,7 +190,8 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
     int16_t div = 1 << (keyball_get_scroll_div() - 1);
     int16_t x = divmod16(&m->x, div);
     int16_t y = divmod16(&m->y, div);
-
+     oled_write_ln("motion to mouse scroll", false);
+     oled_write_ln(KEYBALL_MODEL, false);
     // apply to mouse report.
 #if KEYBALL_MODEL == 61 || KEYBALL_MODEL == 39 || KEYBALL_MODEL == 147 || KEYBALL_MODEL == 44
     r->h = clip2int8(y);
@@ -237,6 +238,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
 
 static void motion_to_mouse(keyball_motion_t *m, report_mouse_t *r, bool is_left, bool as_scroll) {
     if (as_scroll) {
+         oled_write_ln("as scroll on", false);
         keyball_on_apply_motion_to_mouse_scroll(m, r, is_left);
     } else {
         keyball_on_apply_motion_to_mouse_move(m, r, is_left);
@@ -519,6 +521,7 @@ bool keyball_get_scroll_mode(void) {
 }
 
 void keyball_set_scroll_mode(bool mode) {
+    // デバッグ用
     if (mode) {
         oled_write_ln("Scroll Mode: ON", false);
     } else {

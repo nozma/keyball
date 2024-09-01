@@ -169,7 +169,7 @@ void pointing_device_driver_set_cpi(uint16_t cpi) {
 __attribute__((weak)) void keyball_on_apply_motion_to_mouse_move(keyball_motion_t *m, report_mouse_t *r, bool is_left) {
 #if KEYBALL_MODEL == 61 || KEYBALL_MODEL == 39 || KEYBALL_MODEL == 147 || KEYBALL_MODEL == 44
     r->x = clip2int8(m->x);
-    r->y = -clip2int8(m->y);
+    r->y = clip2int8(m->y);
     if (is_left) {
         r->x = -r->x;
         r->y = -r->y;
@@ -235,9 +235,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(keyball_motio
 }
 
 static void motion_to_mouse(keyball_motion_t *m, report_mouse_t *r, bool is_left, bool as_scroll) {
-    //oled_write_ln("motion to mouse", false);
     if (as_scroll) {
-        oled_write_ln("as scroll on", false);
         keyball_on_apply_motion_to_mouse_scroll(m, r, is_left);
     } else {
         keyball_on_apply_motion_to_mouse_move(m, r, is_left);

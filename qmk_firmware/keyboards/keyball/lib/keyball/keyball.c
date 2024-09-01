@@ -48,7 +48,7 @@ keyball_t keyball = {
     .cpi_value   = 0,
     .cpi_changed = false,
 
-    .scroll_mode = false,
+    .scroll_mode = true,
     .scroll_div  = 0,
 
     .pressing_keys = { BL, BL, BL, BL, BL, BL, 0 },

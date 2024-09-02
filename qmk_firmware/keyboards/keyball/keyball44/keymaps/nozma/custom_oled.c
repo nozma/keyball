@@ -172,7 +172,7 @@ static void print_wpm_type_count(void) {
     static char type_count_str[7];
     oled_write_ln_P(PSTR("Count"), false);
     itoa(type_count, type_count_str, 10);
-    oled_write_ln(type_count_str, false);
+    oled_write(type_count_str, false);
 }
 
 // デフォルトページ表示

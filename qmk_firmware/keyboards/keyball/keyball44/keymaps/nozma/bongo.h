@@ -1,3 +1,5 @@
+#include QMK_KEYBOARD_H
+
 #define ANIM_FRAME_DURATION 75 // how long each frame lasts in ms
 #define ANIM_SIZE 636 // number of bytes in array, minimize for adequate firmware size, max is 1024
 #define IDLE_FRAMES 5

@@ -492,26 +492,11 @@ static void draw_bongo(bool minimal)
             break;
     }
 
-    if (!minimal)
-    {
-        // print type count
-        //static char type_count_str[7];
-        //oled_set_cursor(0, 0);
-        //oled_write_P(PSTR("type:"), false);
-        //itoa(type_count, type_count_str, 10);
-        //oled_write(type_count_str, false);
-
-        // calculate && print clock
-        //oled_set_cursor(0, 2);
-        //uint8_t  hour = last_minute / 60;
-        //uint16_t minute = last_minute % 60;
-        //bool is_pm = (hour / 12) > 0;
-        //hour = hour % 12;
-        //if (hour == 0) {
-        //    hour = 12;
-        //}
-        //static char time_str[8] = "";
-        //sprintf(time_str, "%02d:%02d%s", hour, minute, is_pm ? "pm" : "am");
-        //oled_write(time_str, false);
+    if (!minimal) {
+    // LEDステータス表示
+    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
+    oled_write_P(PSTR("spd "), false);
+    oled_write(itoc(rgblight_get_speed(), 0), false);
+    oled_write_P(PSTR("mo"), false);
+    oled_write(itoc(rgblight_get_mode(), 3), false);
     }
-}

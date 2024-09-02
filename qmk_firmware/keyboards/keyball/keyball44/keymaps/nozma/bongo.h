@@ -481,10 +481,12 @@ extern const char *itoc_(uint8_t number, uint8_t width) {
 
 // LEDステータス表示
 static void print_led_status_(void) {
-    oled_set_cursor(0, 5);
+    oled_set_cursor(0, 0);
     oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
+    oled_set_cursor(0, 1)
     oled_write_P(PSTR("spd "), false);
     oled_write(itoc_(rgblight_get_speed(), 0), false);
+    oled_set_cursor(0, 2)
     oled_write_P(PSTR("mo"), false);
     oled_write(itoc_(rgblight_get_mode(), 3), false);
 }

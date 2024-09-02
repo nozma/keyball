@@ -74,10 +74,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 #include "custom_oled.c"
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    if (is_keyboard_master()) {
+    //if (is_keyboard_master()) {
         return OLED_ROTATION_270;
-    }
-    return OLED_ROTATION_180;
+    //}
+    // return OLED_ROTATION_180;
 }
 
 // メイン、サブの判定

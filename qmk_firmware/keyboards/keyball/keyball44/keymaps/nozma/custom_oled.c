@@ -107,12 +107,12 @@ static const char *itoc(uint8_t number, uint8_t width) {
 // CPI, スクロール情報表示
 static void print_cpi_status(void) {
     oled_write_raw_P(img_title, sizeof(img_title));
-    oled_set_cursor(0, 2);
+    oled_set_cursor(0, 1);
 
     oled_write(itoc(keyball_get_cpi(), 0), false);
     oled_write_P(PSTR(" "), false);
     
-    oled_set_cursor(4, 2);
+    oled_set_cursor(4, 1);
     oled_write_char('0' + keyball_get_scroll_div(), false);
 }
 
@@ -163,14 +163,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // WPM, type count表示
 static void print_wpm_type_count(void) {
     // WPM表示
-    oled_set_cursor(0, 4);
+    oled_set_cursor(0, 3);
     static char wpm[5];
     oled_write_ln_P(PSTR("WPM"), false);
     itoa(get_current_wpm(), wpm, 10);
     oled_write_ln(wpm, false);
     // type count表示
     static char type_count_str[7];
-    //oled_write_ln_P(PSTR("Count"), false);
+    oled_write_ln_P(PSTR("Count"), false);
     itoa(type_count, type_count_str, 10);
     oled_write_ln(type_count_str, false);
 }

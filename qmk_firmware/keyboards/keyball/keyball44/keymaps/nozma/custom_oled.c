@@ -152,7 +152,7 @@ static void print_wpm(void) {
     static char wpm[5];
     oled_write_ln_P(PSTR("WPM:"), false);
     itoa(get_current_wpm(), wpm, 10);
-    oled_write_ln;(wpm, false);
+    oled_write_ln(wpm, false);
 }
 
 // デフォルトページ表示

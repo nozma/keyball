@@ -454,7 +454,7 @@ void eval_anim_state(void)
 }
 
 // 数値を文字列に変換します。指定桁数の右寄せでスペースパディングされます。
-extern const char *itoc(uint8_t number, uint8_t width) {
+extern const char *itoc_(uint8_t number, uint8_t width) {
     static char str[5]; 
     uint8_t i = 0;
     width = width > 4 ? 4 : width;
@@ -480,7 +480,7 @@ extern const char *itoc(uint8_t number, uint8_t width) {
 }
 
 // LEDステータス表示
-static void print_led_status(void) {
+static void print_led_status_(void) {
     oled_set_cursor(0, 5);
     oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
     oled_write_P(PSTR("spd "), false);
@@ -530,6 +530,6 @@ static void draw_bongo(bool minimal)
 
     if (!minimal) {
         // LEDステータス表示
-        print_led_status();
+        print_led_status_();
     }
 }

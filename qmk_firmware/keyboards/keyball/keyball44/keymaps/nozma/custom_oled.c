@@ -147,7 +147,7 @@ static void print_scroll_status(void) {
 //}
 
 // WPM表示
-static void print_wpm_type_count(void) {
+static void print_wpm(void) {
     oled_set_cursor(0, 5);
     static char wpm[5];
     oled_write_P(PSTR("WPM:"), false);
@@ -158,6 +158,7 @@ static void print_wpm_type_count(void) {
 // デフォルトページ表示
 static void render_default(void) {
     print_cpi_status();
+    print_wpm();
     print_layer_status();
     print_scroll_status();
 }

@@ -1,5 +1,3 @@
-#include "custom_oled.c"
-
 #define ANIM_FRAME_DURATION 75 // how long each frame lasts in ms
 #define ANIM_SIZE 636 // number of bytes in array, minimize for adequate firmware size, max is 1024
 #define IDLE_FRAMES 5
@@ -455,6 +453,42 @@ void eval_anim_state(void)
     }
 }
 
+// 数値を文字列に変換します。指定桁数の右寄せでスペースパディングされます。
+extern const char *itoc(uint8_t number, uint8_t width) {
+    static char str[5]; 
+    uint8_t i = 0;
+    width = width > 4 ? 4 : width;
+
+    do {
+        str[i++] = number % 10 + '0';
+        number /= 10;
+    } while (number != 0);
+
+    while (i < width) {
+        str[i++] = ' ';
+    }
+
+    int len = i;
+    for (int j = 0; j < len / 2; j++) {
+        char temp = str[j];
+        str[j] = str[len - j - 1];
+        str[len - j - 1] = temp;
+    }
+
+    str[i] = '\0';
+    return str;
+}
+
+// LEDステータス表示
+static void print_led_status(void) {
+    oled_set_cursor(0, 5);
+    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
+    oled_write_P(PSTR("spd "), false);
+    oled_write(itoc(rgblight_get_speed(), 0), false);
+    oled_write_P(PSTR("mo"), false);
+    oled_write(itoc(rgblight_get_mode(), 3), false);
+}
+
 static void draw_bongo(bool minimal)
 {
     eval_anim_state();
@@ -498,3 +532,4 @@ static void draw_bongo(bool minimal)
         // LEDステータス表示
         print_led_status();
     }
+}

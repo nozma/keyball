@@ -495,10 +495,6 @@ static void draw_bongo(bool minimal)
     }
 
     if (!minimal) {
-    // LEDステータス表示
-    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
-    oled_write_P(PSTR("spd "), false);
-    oled_write(itoc(rgblight_get_speed(), 0), false);
-    oled_write_P(PSTR("mo"), false);
-    oled_write(itoc(rgblight_get_mode(), 3), false);
+        // LEDステータス表示
+        print_led_status();
     }

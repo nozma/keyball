@@ -79,7 +79,7 @@ static const char PROGMEM img_scroll_no[] = {
 };
 
 // 数値を文字列に変換します。指定桁数の右寄せでスペースパディングされます。
-static const char *itoc(uint8_t number, uint8_t width) {
+extern const char *itoc(uint8_t number, uint8_t width) {
     static char str[5]; 
     uint8_t i = 0;
     width = width > 4 ? 4 : width;
@@ -137,7 +137,7 @@ static void print_scroll_status(void) {
 }
 
 // LEDステータス表示
-static void print_led_status(void) {
+extern void print_led_status(void) {
     oled_set_cursor(0, 5);
     oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
     oled_write_P(PSTR("spd "), false);

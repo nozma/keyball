@@ -137,19 +137,27 @@ static void print_scroll_status(void) {
 }
 
 // LEDステータス表示
-static void print_led_status(void) {
+//static void print_led_status(void) {
+//    oled_set_cursor(0, 5);
+//    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
+//    oled_write_P(PSTR("spd "), false);
+//    oled_write(itoc(rgblight_get_speed(), 0), false);
+//    oled_write_P(PSTR("mo"), false);
+//    oled_write(itoc(rgblight_get_mode(), 3), false);
+//}
+
+// WPM表示
+static void print_wpm_type_count(void) {
     oled_set_cursor(0, 5);
-    oled_write_P(rgblight_is_enabled() ? PSTR("led o") : PSTR("led -"), false);
-    oled_write_P(PSTR("spd "), false);
-    oled_write(itoc(rgblight_get_speed(), 0), false);
-    oled_write_P(PSTR("mo"), false);
-    oled_write(itoc(rgblight_get_mode(), 3), false);
+    static char wpm[5];
+    oled_write_P(PSTR("WPM:"), false);
+    itoa(get_current_wpm(), wpm, 10);
+    oled_write_ln(wpm, false);
 }
 
 // デフォルトページ表示
 static void render_default(void) {
     print_cpi_status();
-    print_led_status();
     print_layer_status();
     print_scroll_status();
 }

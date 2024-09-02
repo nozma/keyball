@@ -146,13 +146,33 @@ static void print_scroll_status(void) {
 //    oled_write(itoc(rgblight_get_mode(), 3), false);
 //}
 
-// WPM表示
-static void print_wpm(void) {
-    oled_set_cursor(0, 5);
+// キーを押した回数のカウント
+static uint16_t type_count = 0;
+void count_type(void) {
+    type_count++;
+}
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef OLED_ENABLE
+    if (record->event.pressed) {
+        count_type();
+    }
+#endif
+    return true;
+}
+
+// WPM, type count表示
+static void print_wpm_type_count(void) {
+    // WPM表示
+    oled_set_cursor(0, 4);
     static char wpm[5];
-    oled_write_ln_P(PSTR("WPM:"), false);
+    oled_write_ln_P(PSTR("WPM"), false);
     itoa(get_current_wpm(), wpm, 10);
     oled_write_ln(wpm, false);
+    // type count表示
+    static char type_count_str[7];
+    oled_write_ln_P(PSTR("Count"), false);
+    itoa(type_count, tyep_count_str, 10);
+    oled_write_ln(type_count_str, false);
 }
 
 // デフォルトページ表示

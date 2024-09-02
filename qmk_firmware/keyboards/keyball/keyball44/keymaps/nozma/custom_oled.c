@@ -150,9 +150,9 @@ static void print_scroll_status(void) {
 static void print_wpm(void) {
     oled_set_cursor(0, 5);
     static char wpm[5];
-    oled_write_P(PSTR("WPM:"), false);
+    oled_write_ln_P(PSTR("WPM:"), false);
     itoa(get_current_wpm(), wpm, 10);
-    oled_write_ln(wpm, false);
+    oled_write_ln;(wpm, false);
 }
 
 // デフォルトページ表示

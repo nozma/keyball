@@ -714,7 +714,7 @@ static void print_led_status_(void) {
     oled_write_P(PSTR("mo"), false);
     oled_write(itoc_(rgblight_get_mode(), 3), false);
 
-    oled_set_cursor(0, 7);
+    oled_set_cursor(0, 4);
     oled_write_P(PSTR("h "), false);
     oled_write(itoc_(rgblight_get_hue(), 3), false);
 

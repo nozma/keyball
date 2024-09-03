@@ -713,6 +713,16 @@ static void print_led_status_(void) {
     oled_set_cursor(0, 2);
     oled_write_P(PSTR("mo"), false);
     oled_write(itoc_(rgblight_get_mode(), 3), false);
+
+    oled_set_cursor(0, 7);
+    oled_write_P(PSTR("h "), false);
+    oled_write(itoc(rgblight_get_hue(), 3), false);
+
+    oled_write_P(PSTR("s "), false);
+    oled_write(itoc(rgblight_get_sat(), 3), false);
+
+    oled_write_P(PSTR("v "), false);
+    oled_write_ln(itoc(rgblight_get_val(), 3), false);
 }
 
 static void draw_bongo(bool minimal)

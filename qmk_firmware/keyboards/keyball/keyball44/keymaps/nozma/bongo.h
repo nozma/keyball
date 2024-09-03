@@ -719,7 +719,7 @@ static void draw_bongo(bool minimal)
 {
     eval_anim_state();
 
-    oled_set_cursor(0, 3);
+    oled_set_cursor(0, 4);
 
     switch (anim_state)
     {

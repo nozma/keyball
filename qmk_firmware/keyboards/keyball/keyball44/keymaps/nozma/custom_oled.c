@@ -112,8 +112,21 @@ static void print_cpi_status(void) {
     oled_write(itoc(keyball_get_cpi(), 0), false);
     oled_write_P(PSTR(" "), false);
     
-    oled_set_cursor(4, 2);
+    oled_set_cursor(2, 2);
     oled_write_char('0' + keyball_get_scroll_div(), false);
+
+    oled_set_cursor(4, 2);
+    switch (keyball_get_scrollsnap_mode()) {
+        case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
+            oled_write_P(PSTR("V"), false);
+            break;
+        case KEYBALL_SCROLLSNAP_MODE_HORIZONTAL:
+            oled_write_P(PSTR("H"), false);
+            break;
+        default:
+            oled_write_P(PSTR("\xBE\xBF"), false);
+            break;
+    }
 }
 
 // レイヤーNo表示
@@ -134,22 +147,6 @@ static void print_scroll_status(void) {
     oled_write_raw_P(keyball.scroll_mode ? img_scroll_up : img_scroll_no, sizeof(img_scroll_no));
     oled_set_cursor(0, 14);
     oled_write_raw_P(keyball.scroll_mode ? img_scroll_down : img_scroll_no, sizeof(img_scroll_no));
-}
-
-// スクロールスナップモード表示
-static void print_scroll_snap(void) {
-    oled_set_cursor(5, 2);
-    switch (keyball_get_scrollsnap_mode()) {
-        case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
-            oled_write_P(PSTR("VT"), false);
-            break;
-        case KEYBALL_SCROLLSNAP_MODE_HORIZONTAL:
-            oled_write_P(PSTR("HO"), false);
-            break;
-        default:
-            oled_write_P(PSTR("\xBE\xBF"), false);
-            break;
-    }
 }
 
 // LEDステータス表示
@@ -195,7 +192,6 @@ static void print_wpm_type_count(void) {
 static void render_default(void) {
     print_cpi_status();
     print_wpm_type_count();
-    print_scroll_snap();
     print_layer_status();
     print_scroll_status();
 }

@@ -136,6 +136,21 @@ static void print_scroll_status(void) {
     oled_write_raw_P(keyball.scroll_mode ? img_scroll_down : img_scroll_no, sizeof(img_scroll_no));
 }
 
+// スクロールスナップモード表示
+static void print_scroll_snap(void) {
+    switch (keyball_get_scrollsnap_mode()) {
+        case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
+            oled_write_P(PSTR("VT"), false);
+            break;
+        case KEYBALL_SCROLLSNAP_MODE_HORIZONTAL:
+            oled_write_P(PSTR("HO"), false);
+            break;
+        default:
+            oled_write_P(PSTR("\xBE\xBF"), false);
+            break;
+    }
+}
+
 // LEDステータス表示
 //static void print_led_status(void) {
 //    oled_set_cursor(0, 5);
@@ -179,6 +194,7 @@ static void print_wpm_type_count(void) {
 static void render_default(void) {
     print_cpi_status();
     print_wpm_type_count();
+    print_scroll_snap();
     print_layer_status();
     print_scroll_status();
 }

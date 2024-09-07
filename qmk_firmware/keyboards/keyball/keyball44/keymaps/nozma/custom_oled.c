@@ -123,8 +123,8 @@ static void print_cpi_status(void) {
         case KEYBALL_SCROLLSNAP_MODE_HORIZONTAL:
             oled_write_P(PSTR("H"), false);
             break;
-        default:
-            oled_write_P(PSTR("\xBE\xBF"), false);
+        default: // free
+            oled_write_P(PSTR("F"), false);
             break;
     }
 }

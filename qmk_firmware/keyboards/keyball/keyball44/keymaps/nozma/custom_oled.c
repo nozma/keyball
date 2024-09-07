@@ -138,6 +138,7 @@ static void print_scroll_status(void) {
 
 // スクロールスナップモード表示
 static void print_scroll_snap(void) {
+    oled_set_cursor(5, 2);
     switch (keyball_get_scrollsnap_mode()) {
         case KEYBALL_SCROLLSNAP_MODE_VERTICAL:
             oled_write_P(PSTR("VT"), false);

@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef RGB_MATRIX_ENABLE
 #define DRIVER_LED_TOTAL 60
 #define RGB_MATRIX_LED_COUNT 60
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 125 // limits maximum brightness of LEDs to 200 out of 255. If not defined maximum brightness is set to 255
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150 // limits maximum brightness of LEDs to 200 out of 255. If not defined maximum brightness is set to 255
 #define RGB_MATRIX_DEFAULT_HUE 125 // Sets the default hue value, if none has been set
 #define RGB_MATRIX_DEFAULT_SAT 255 // Sets the default saturation value, if none has been set
 #define RGB_MATRIX_DEFAULT_VAL 125 // Sets the default brightness value, if none has been set
@@ -47,10 +47,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENABLE_RGB_MATRIX_TYPING_HEATMAP
 #define RGB_MATRIX_TYPING_HEATMAP_SPREAD 32
 #define RGB_MATRIX_TYPING_HEATMAP_AREA_LIMIT 16
-#define RGB_MATRIX_TYPING_HEATMAP_DECREASE_DELAY_MS 25
+#define RGB_MATRIX_TYPING_HEATMAP_DECREASE_DELAY_MS 50
 
 #define RGB_MATRIX_KEYPRESSES // reacts to keypresses
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
+
+#define ENABLE_RGB_MATRIX_BREATHING
+#define ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
+#define ENABLE_RGB_MATRIX_CYCLE_PINWHEEL
 
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_TYPING_HEATMAP// Sets the default mode, if none has been set
 

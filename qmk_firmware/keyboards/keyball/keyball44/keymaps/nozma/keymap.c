@@ -238,5 +238,5 @@ led_config_t g_led_config = {
     LED_FLAG_KEYLIGHT, //59
     LED_FLAG_NONE //60
    }
-}
+};
 #endif

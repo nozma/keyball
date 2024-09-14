@@ -52,6 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
 
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_TYPING_HEATMAP// Sets the default mode, if none has been set
+
+#define WS2812_PIO_USE_PIO1 // RP2040用に追加
+#define WS2812_DI_PIN GP0 // D-inをつなぐTX0の端子
 #endif
 
 #define TAP_CODE_DELAY 5

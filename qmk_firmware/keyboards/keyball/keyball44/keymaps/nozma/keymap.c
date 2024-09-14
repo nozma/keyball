@@ -174,7 +174,7 @@ led_config_t g_led_config = {
     {149, 164}, //58
     {224, 164}, //59
     {0, 0}  //60
-   }
+   },
     // LED Index to Flag
    {
     LED_FLAG_KEYLIGHT, //1

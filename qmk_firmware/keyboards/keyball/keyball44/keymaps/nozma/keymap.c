@@ -96,11 +96,13 @@ bool oled_task_user(void) {
 led_config_t g_led_config = {
     // Key Matrix to LED Index
     /* layout image
-    { 18,  15,  11,   7,   4,   1,               57,  54,  51,  48,  44,  41}, \
-    { 19,  16,  12,   8,   5,   2,               58,  55,  52,  49,  45,  42}, \
-    { 20,  17,  13,   9,   6,   3,               59,  56,  53,  50,  46,  43}, \
-    {           14,  10,  28,  29,  30,     31,  32,                 47     }  \
+    l  1    2    3    4    5    6    7      10   11   12   13   14   15   16
+    { 18,  15,  11,   7,   4,   1,               57,  54,  51,  48,  44,  41}, \ 1
+    { 19,  16,  12,   8,   5,   2,               58,  55,  52,  49,  45,  42}, \ 2
+    { 20,  17,  13,   9,   6,   3,               59,  56,  53,  50,  46,  43}, \ 3
+    {           14,  10,  28,  29,  30,     31,  32,                 47     }  \ 4
     */
+   {
     {    18,    15,    11,     7,     4,     1 }, \
     {    19,    16,    12,     8,     5,     2 }, \
     {    20,    17,    13,     9,     6,     3 }, \
@@ -109,8 +111,132 @@ led_config_t g_led_config = {
     {    42,    45,    49,    52,    55,    58 }, \
     {    43,    46,    50,    53,    56,    59 }, \
     {NO_LED,    47,NO_LED,NO_LED,    32,    31 }, \
-
+   },
     // LED Index to phisical poisiton
+   {
+    {75, 90}, //1
+    {149, 90}, //2
+    {224, 90}, //3
+    {75, 75}, //4
+    {149, 75}, //5
+    {224, 75}, //6
+    {75, 60}, //7
+    {149, 60}, //8
+    {224, 60}, //9
+    {299, 60}, //10
+    {75, 45}, //11
+    {149, 45}, //12
+    {224, 45}, //13
+    {299, 45}, //14
+    {75, 30}, //15
+    {149, 30}, //16
+    {224, 30}, //17
+    {75, 15}, //18
+    {149, 15}, //19
+    {224, 15}, //20
+    {0, 0}, //21
+    {0, 0}, //22
+    {0, 0}, //23
+    {0, 0}, //24
+    {0, 0}, //25
+    {0, 0}, //26
+    {0, 0}, //27
+    {299, 75}, //28
+    {299, 90}, //29
+    {299, 105}, //30
+    {299, 149}, //31
+    {299, 164}, //32
+    {0, 0}, //33
+    {0, 0}, //34
+    {0, 0}, //35
+    {0, 0}, //36
+    {0, 0}, //37
+    {0, 0}, //38
+    {0, 0}, //39
+    {0, 0}, //40
+    {75, 239}, //41
+    {149, 239}, //42
+    {224, 239}, //43
+    {75, 224}, //44
+    {149, 224}, //45
+    {224, 224}, //46
+    {299, 224}, //47
+    {75, 209}, //48
+    {149, 209}, //49
+    {224, 209}, //50
+    {75, 194}, //51
+    {149, 194}, //52
+    {224, 194}, //53
+    {75, 179}, //54
+    {149, 179}, //55
+    {224, 179}, //56
+    {75, 164}, //57
+    {149, 164}, //58
+    {224, 164}, //59
+    {0, 0}  //60
+   }
     // LED Index to Flag
+   {
+    LED_FLAG_KEYLIGHT, //1
+    LED_FLAG_KEYLIGHT, //2
+    LED_FLAG_KEYLIGHT, //3
+    LED_FLAG_KEYLIGHT, //4
+    LED_FLAG_KEYLIGHT, //5
+    LED_FLAG_KEYLIGHT, //6
+    LED_FLAG_KEYLIGHT, //7
+    LED_FLAG_KEYLIGHT, //8
+    LED_FLAG_KEYLIGHT, //9
+    LED_FLAG_KEYLIGHT, //10
+    LED_FLAG_KEYLIGHT, //11
+    LED_FLAG_KEYLIGHT, //12
+    LED_FLAG_KEYLIGHT, //13
+    LED_FLAG_KEYLIGHT, //14
+    LED_FLAG_KEYLIGHT, //15
+    LED_FLAG_KEYLIGHT, //16
+    LED_FLAG_KEYLIGHT, //17
+    LED_FLAG_KEYLIGHT, //18
+    LED_FLAG_KEYLIGHT, //19
+    LED_FLAG_KEYLIGHT, //20
+    LED_FLAG_NONE, //21
+    LED_FLAG_NONE, //22
+    LED_FLAG_NONE, //23
+    LED_FLAG_NONE, //24
+    LED_FLAG_NONE, //25
+    LED_FLAG_NONE, //26
+    LED_FLAG_NONE, //27
+    LED_FLAG_KEYLIGHT, //28
+    LED_FLAG_KEYLIGHT, //29
+    LED_FLAG_KEYLIGHT, //30
+    LED_FLAG_KEYLIGHT, //31
+    LED_FLAG_KEYLIGHT, //32
+    LED_FLAG_NONE, //33
+    LED_FLAG_NONE, //34
+    LED_FLAG_NONE, //35
+    LED_FLAG_NONE, //36
+    LED_FLAG_NONE, //37
+    LED_FLAG_NONE, //38
+    LED_FLAG_NONE, //39
+    LED_FLAG_NONE, //40
+    LED_FLAG_KEYLIGHT, //41
+    LED_FLAG_KEYLIGHT, //42
+    LED_FLAG_KEYLIGHT, //43
+    LED_FLAG_KEYLIGHT, //44
+    LED_FLAG_KEYLIGHT, //45
+    LED_FLAG_KEYLIGHT, //46
+    LED_FLAG_KEYLIGHT, //47
+    LED_FLAG_KEYLIGHT, //48
+    LED_FLAG_KEYLIGHT, //49
+    LED_FLAG_KEYLIGHT, //50
+    LED_FLAG_KEYLIGHT, //51
+    LED_FLAG_KEYLIGHT, //52
+    LED_FLAG_KEYLIGHT, //53
+    LED_FLAG_KEYLIGHT, //54
+    LED_FLAG_KEYLIGHT, //55
+    LED_FLAG_KEYLIGHT, //56
+    LED_FLAG_KEYLIGHT, //57
+    LED_FLAG_KEYLIGHT, //58
+    LED_FLAG_KEYLIGHT, //59
+    LED_FLAG_NONE //60
+   }
 }
 #endif

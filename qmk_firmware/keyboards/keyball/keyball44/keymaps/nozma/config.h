@@ -99,3 +99,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PMW33XX_CLOCK_SPEED 2000000 // Sets the clock speed that the sensor runs at. Defaults to 2000000
 #define MOUSE_EXTENDED_REPORT // Use -32767 to 32767, instead of just -127 to 127.
 // #define POINTING_DEVICE_TASK_THROTTLE_MS 10
+
+#define QUICK_TAP_TERM_PER_KEY

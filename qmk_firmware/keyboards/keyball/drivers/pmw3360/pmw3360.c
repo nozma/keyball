@@ -18,33 +18,95 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "quantum.h"
 #include "pmw3360.h"
 
+#if defined(MCU_RP)
+#    include "hardware/spi.h"
+#    include "hardware/gpio.h"
+#    include "hardware/clocks.h"
+static spi_inst_t *const pmw3360_spi_instance = spi0;
+static bool             pmw3360_spi_initialized = false;
+
+#    define PMW_SPI_WRITE(data) pmw3360_spi_transfer((data))
+#    define PMW_SPI_READ()       pmw3360_spi_transfer(0x00)
+#    define PMW_SPI_STOP()       pmw3360_cs_high()
+#    define PMW3360_SPI_DIVISOR (clock_get_hz(clk_sys) / PMW3360_CLOCKS)
+
+static inline void pmw3360_cs_low(void) {
+    gpio_put(PMW3360_NCS_PIN, 0);
+}
+
+static inline void pmw3360_cs_high(void) {
+    gpio_put(PMW3360_NCS_PIN, 1);
+}
+
+static inline uint8_t pmw3360_spi_transfer(uint8_t data) {
+    uint8_t rx = 0;
+    spi_write_read_blocking(pmw3360_spi_instance, &data, &rx, 1);
+    return rx;
+}
+#else
+#    define PMW_SPI_WRITE(data) spi_write((data))
+#    define PMW_SPI_READ()       spi_read()
+#    define PMW_SPI_STOP()       spi_stop()
+#    define PMW3360_SPI_DIVISOR (F_CPU / PMW3360_CLOCKS)
+#endif
+
 // Include SROM definitions.
 #include "srom_0x04.c"
 #include "srom_0x81.c"
 
 #define PMW3360_SPI_MODE 3
-#define PMW3360_SPI_DIVISOR (clock_get_hz(clk_sys) / PMW3360_CLOCKS)
 #define PMW3360_CLOCKS 2000000
 
 static bool motion_bursting = false;
 
 void pmw3360_spi_init(void) {
+#if defined(MCU_RP)
+    if (!pmw3360_spi_initialized) {
+        spi_init(pmw3360_spi_instance, PMW3360_CLOCKS);
+        spi_set_format(pmw3360_spi_instance, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
+        gpio_set_function(SPI_SCK_PIN, GPIO_FUNC_SPI);
+        gpio_set_function(SPI_MOSI_PIN, GPIO_FUNC_SPI);
+        gpio_set_function(SPI_MISO_PIN, GPIO_FUNC_SPI);
+        gpio_init(PMW3360_NCS_PIN);
+        gpio_set_dir(PMW3360_NCS_PIN, GPIO_OUT);
+        pmw3360_cs_high();
+        pmw3360_spi_initialized = true;
+    }
+#else
     spi_init();
     setPinOutput(PMW3360_NCS_PIN);
     writePinHigh(PMW3360_NCS_PIN);
+#endif
 }
 
 bool pmw3360_spi_start(void) {
+#if defined(MCU_RP)
+    pmw3360_cs_low();
+    return true;
+#else
     return spi_start(PMW3360_NCS_PIN, false, PMW3360_SPI_MODE, PMW3360_SPI_DIVISOR);
+#endif
 }
 
 uint8_t pmw3360_reg_read(uint8_t addr) {
     pmw3360_spi_start();
+#if defined(MCU_RP)
+    pmw3360_spi_transfer(addr & 0x7f);
+#else
     spi_write(addr & 0x7f);
+#endif
     wait_us(160);
+#if defined(MCU_RP)
+    uint8_t data = pmw3360_spi_transfer(0x00);
+#else
     uint8_t data = pmw3360_spi_read();
+#endif
     wait_us(1);
+#if defined(MCU_RP)
+    pmw3360_cs_high();
+#else
     spi_stop();
+#endif
     wait_us(19);
     if (addr != pmw3360_Motion_Burst) {
         motion_bursting = false;
@@ -54,10 +116,19 @@ uint8_t pmw3360_reg_read(uint8_t addr) {
 
 void pmw3360_reg_write(uint8_t addr, uint8_t data) {
     pmw3360_spi_start();
+#if defined(MCU_RP)
+    pmw3360_spi_transfer(addr | 0x80);
+    pmw3360_spi_transfer(data);
+#else
     spi_write(addr | 0x80);
     spi_write(data);
+#endif
     wait_us(35);
+#if defined(MCU_RP)
+    pmw3360_cs_high();
+#else
     spi_stop();
+#endif
     wait_us(145);
 }
 
@@ -118,24 +189,27 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
     }
 
     pmw3360_spi_start();
-    spi_write(pmw3360_Motion_Burst);
+    PMW_SPI_WRITE(pmw3360_Motion_Burst);
     wait_us(35);
-    spi_read(); // skip MOT
-    spi_read(); // skip Observation
-    d->y = spi_read();
-    d->y |= spi_read() << 8;
-    d->x = spi_read();
-    d->x |= spi_read() << 8;
-    spi_stop();
+    PMW_SPI_READ(); // skip MOT
+    PMW_SPI_READ(); // skip Observation
+    d->y = PMW_SPI_READ();
+    d->y |= PMW_SPI_READ() << 8;
+    d->x = PMW_SPI_READ();
+    d->x |= PMW_SPI_READ() << 8;
+    PMW_SPI_STOP();
     wait_us(1);
     return true;
 }
 
 bool pmw3360_init(void) {
-    spi_init();
-    setPinOutput(PMW3360_NCS_PIN);
-    // reboot
-    pmw3360_spi_start();
+    pmw3360_spi_init();
+
+    bool ok = pmw3360_spi_start();
+    if (!ok) {
+        return false;
+    }
+
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
 
@@ -149,7 +223,7 @@ bool pmw3360_init(void) {
 
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
-    spi_stop();
+    PMW_SPI_STOP();
 
     return pid == 0x42 && rev == 0x01;
 }
@@ -163,14 +237,14 @@ void pmw3360_srom_upload(pmw3360_srom_t srom) {
     pmw3360_reg_write(pmw3360_SROM_Enable, 0x18);
 
     pmw3360_spi_start();
-    spi_write(pmw3360_SROM_Load_Burst | 0x80);
+    PMW_SPI_WRITE(pmw3360_SROM_Load_Burst | 0x80);
     wait_us(15);
     for (size_t i = 0; i < srom.len; i++) {
         uint8_t byte = pgm_read_byte(srom.data + i);
-        pmw3360_spi_write(byte);
+        PMW_SPI_WRITE(byte);
         wait_us(15);
     }
-    spi_stop();
+    PMW_SPI_STOP();
     wait_us(200);
 
     pmw3360_srom_id = pmw3360_reg_read(pmw3360_SROM_ID);

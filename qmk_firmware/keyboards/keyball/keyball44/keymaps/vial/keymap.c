@@ -18,10 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 #ifdef BONGO_ENABLE
-#include "bongo.h"
+#    include "bongo.h"
 #endif
 
 #include "quantum.h"
+#include "dynamic_keymap.h"
+#include "eeconfig.h"
+#ifdef VIAL_ENABLE
+#    include "raw_hid.h"
+#    include "quantum/vial.h"
+#endif
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -86,39 +92,51 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
-uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case LT(1,KC_LNG2):
-            return 0;
-        case LT(2,KC_LNG1):
-            return 0;
-        default:
-            return QUICK_TAP_TERM;
+void keyboard_post_init_user(void) {
+    if (!eeconfig_is_enabled()) {
+        eeconfig_init();
     }
+
+#ifdef VIAL_ENABLE
+    vial_init();
+#endif
 }
 
 #ifdef OLED_ENABLE
-
-#include "lib/oledkit/oledkit.h"
-#include "custom_oled.c"
+#    include "lib/oledkit/oledkit.h"
+#    define CUSTOM_OLED_SKIP_PROCESS_RECORD
+#    include "custom_oled.c"
+#    undef CUSTOM_OLED_SKIP_PROCESS_RECORD
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    //if (is_keyboard_master()) {
-        return OLED_ROTATION_270;
-    //}
-    // return OLED_ROTATION_180;
+    return OLED_ROTATION_270;
 }
 
-// メイン、サブの判定
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         keyball_oled_render_mymain();
     } else {
+#    ifdef BONGO_ENABLE
         draw_bongo(false);
+#    endif
     }
     return true;
 }
 #endif
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef OLED_ENABLE
+    if (record->event.pressed) {
+        count_type();
+    }
+#endif
+#ifdef VIAL_ENABLE
+    if (!process_record_vial(keycode, record)) {
+        return false;
+    }
+#endif
+    return true;
+}
 
 // RGB_MATRIX
 #ifdef RGB_MATRIX_ENABLE

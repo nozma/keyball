@@ -30,7 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Split parameters
 #define SOFT_SERIAL_PIN         GP1
 #define SPLIT_HAND_MATRIX_GRID  GP26, GP4
-// #define SPLIT_USB_DETECT
+#define SPLIT_HAND_MATRIX_GRID_LOW_IS_LEFT
+#define SPLIT_USB_DETECT
 #ifdef OLED_ENABLE
 #    define SPLIT_OLED_ENABLE
 #endif
@@ -41,6 +42,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define SPLIT_WATCHDOG_ENABLE
 
 #define SPLIT_TRANSACTION_IDS_KB KEYBALL_GET_INFO, KEYBALL_GET_MOTION, KEYBALL_SET_CPI
+
+#ifdef VIAL_ENABLE
+#    define USB_ENDPOINTS_ARE_REORDERABLE
+#    define RAW_USAGE_PAGE 0xFF60
+#    define RAW_USAGE_ID 0x61
+#endif
 
 // RGB LED settings
 #define WS2812_DI_PIN       GP0

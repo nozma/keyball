@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#define BONGO_ENABLE
+
 #ifdef RGBLIGHT_ENABLE
 #    define RGBLIGHT_EFFECT_BREATHING
 #    define RGBLIGHT_EFFECT_RAINBOW_MOOD
@@ -62,15 +64,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WS2812_DI_PIN GP0 // D-inをつなぐTX0の端子
 #endif
 
+#define VIAL_KEYBOARD_UID {0x5B, 0x88, 0x28, 0x3F, 0xB2, 0xE2, 0xF1, 0x7B}
+#define VIAL_UNLOCK_COMBO_ROWS { 0, 4 }
+#define VIAL_UNLOCK_COMBO_COLS { 0, 5 }
+
 #define TAP_CODE_DELAY 5
 
 //#define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 //#define AUTO_MOUSE_DEFAULT_LAYER 1
 #define DYNAMIC_KEYMAP_LAYER_COUNT 8
+#define VIAL_TAP_DANCE_ENTRIES 4
+#define VIAL_COMBO_ENTRIES 4
+#define VIAL_KEY_OVERRIDE_ENTRIES 1
+#define VIAL_ALT_REPEAT_KEY_ENTRIES 1
 #define KEYBALL_CPI_DEFAULT 800
 #define KEYBALL_SCROLL_DIV_DEFAULT 7
-
-#define BONGO_ENABLE
 
 #define LAYER_STATE_8BIT
 
@@ -100,4 +108,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MOUSE_EXTENDED_REPORT // Use -32767 to 32767, instead of just -127 to 127.
 // #define POINTING_DEVICE_TASK_THROTTLE_MS 10
 
-#define QUICK_TAP_TERM_PER_KEY
+#ifndef QUICK_TAP_TERM_PER_KEY
+#    define QUICK_TAP_TERM_PER_KEY
+#endif

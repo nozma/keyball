@@ -1,1 +1,11 @@
 tmp/
+.cache/
+.qmk_work/
+qmk_firmware/.build/
+qmk_firmware/builddefs/
+qmk_firmware/drivers/
+qmk_firmware/platforms/
+qmk_firmware/quantum/
+qmk_firmware/util/
+*.uf2
+*.hex

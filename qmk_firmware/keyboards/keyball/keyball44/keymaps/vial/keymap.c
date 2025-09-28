@@ -17,12 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
-#ifdef BONGO_ENABLE
-#include "bongo.h"
-#endif
-
 #include "quantum.h"
 #include "gpio.h"
+#include "dynamic_keymap.h"
+#include "eeconfig.h"
+#include "print.h"
+#ifdef VIAL_ENABLE
+#    include "raw_hid.h"
+#    include "quantum/vial.h"
+#endif
+#ifdef VIAL_ENABLE
+extern int vial_unlocked;
+#endif
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -67,7 +73,7 @@ void matrix_init_user(void) {
     debug_enable = true;
     setPinOutput(GP25);
     writePinHigh(GP25);
-    uprintf("nozma matrix_init\n");
+    uprintf("matrix_init_user start\n");
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
@@ -76,40 +82,53 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
-uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case LT(1,KC_LNG2):
-            return 0;
-        case LT(2,KC_LNG1):
-            return 0;
-        default:
-            return QUICK_TAP_TERM;
+void keyboard_post_init_user(void) {
+    if (!eeconfig_is_enabled()) {
+        eeconfig_init();
+        uprintf("eeconfig init triggered\n");
     }
+
+#ifdef VIAL_ENABLE
+    vial_init();
+#endif
+    uprintf("keyboard_post_init_user done\n");
 }
 
 #ifdef OLED_ENABLE
-
-#include "lib/oledkit/oledkit.h"
-#include "custom_oled.c"
-
-oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    //if (is_keyboard_master()) {
-        return OLED_ROTATION_270;
-    //}
-    // return OLED_ROTATION_180;
-}
-
-// メイン、サブの判定
 bool oled_task_user(void) {
-    if (is_keyboard_master()) {
-        keyball_oled_render_mymain();
-        oled_write_P(PSTR("nozma"), false);
-    } else {
-        draw_bongo(false);
-    }
-    return true;
+    oled_clear();
+    oled_set_cursor(0, 0);
+    oled_write_P(PSTR("Vial Debug"), false);
+    oled_set_cursor(0, 1);
+    oled_write_P(is_keyboard_master() ? PSTR("MASTER") : PSTR("SLAVE"), false);
+#ifdef VIAL_ENABLE
+    oled_set_cursor(0, 2);
+    oled_write_P(vial_unlocked ? PSTR("UNLOCK") : PSTR("LOCK"), false);
+#endif
+    return false;
 }
 #endif
+
+void matrix_scan_user(void) {
+    static uint32_t count = 0;
+    if (count < 10) {
+#ifdef VIAL_ENABLE
+        uprintf("tick%lu master=%d unlocked=%d\n", (unsigned long)count, is_keyboard_master(), vial_unlocked);
+#else
+        uprintf("tick%lu master=%d\n", (unsigned long)count, is_keyboard_master());
+#endif
+        count++;
+    }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef VIAL_ENABLE
+    if (!process_record_vial(keycode, record)) {
+        return false;
+    }
+#endif
+    return true;
+}
 
 // RGB_MATRIX
 #ifdef RGB_MATRIX_ENABLE

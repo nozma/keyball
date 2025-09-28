@@ -49,3 +49,8 @@ SRC += lib/keyball/keyball.c
 SPACE_CADET_ENABLE = no
 GRAVE_ESC_ENABLE = no
 MAGIC_ENABLE = no
+
+ifeq ($(strip $(MCU)), RP2040)
+    EXTRAINCDIRS += lib/pico-sdk/src/rp2_common/hardware_spi/include
+    SRC += lib/pico-sdk/src/rp2_common/hardware_spi/spi.c
+endif

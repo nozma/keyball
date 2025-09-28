@@ -18,7 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <stdint.h>
-#include "spi_master.h"
+
+#if defined(MCU_RP)
+#    include <stdbool.h>
+#    include "gpio.h"
+typedef int16_t spi_status_t;
+
+#    define SPI_STATUS_SUCCESS (0)
+#    define SPI_STATUS_ERROR (-1)
+#    define SPI_STATUS_TIMEOUT (-2)
+
+#    define SPI_TIMEOUT_IMMEDIATE (0)
+#    define SPI_TIMEOUT_INFINITE (0xFFFF)
+#else
+#    include "spi_master.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Configurations
@@ -139,6 +153,7 @@ uint8_t pmw3360_reg_read(uint8_t addr);
 
 bool pmw3360_spi_start(void);
 
+#if !defined(MCU_RP)
 void inline pmw3360_spi_stop(void) {
     spi_stop();
 }
@@ -152,3 +167,4 @@ spi_status_t inline pmw3360_spi_write(uint8_t data) {
 spi_status_t inline pmw3360_spi_read(void) {
     return spi_read();
 }
+#endif

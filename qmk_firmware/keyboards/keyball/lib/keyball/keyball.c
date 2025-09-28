@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "keyball.h"
 #include "drivers/pmw3360/pmw3360.h"
+#include "print.h"
 
 #include <string.h>
 
@@ -142,7 +143,9 @@ void keyboard_pre_init_kb(void) {
 
 void pointing_device_driver_init(void) {
 #if KEYBALL_MODEL != 46
+    uprintf("pmw3360 init start\n");
     keyball.this_have_ball = pmw3360_init();
+    uprintf("pmw3360 init done have_ball=%d\n", keyball.this_have_ball);
 #endif
     if (keyball.this_have_ball) {
 #if defined(KEYBALL_PMW3360_UPLOAD_SROM_ID)
@@ -565,6 +568,7 @@ void keyball_set_cpi(uint8_t cpi) {
 // Keyboard hooks
 
 void keyboard_post_init_kb(void) {
+    uprintf("keyboard_post_init_kb start\n");
 #ifdef SPLIT_KEYBOARD
     // register transaction handlers on secondary.
     if (!is_keyboard_master()) {
@@ -590,6 +594,7 @@ void keyboard_post_init_kb(void) {
 
     keyball_on_adjust_layout(KEYBALL_ADJUST_PENDING);
     keyboard_post_init_user();
+    uprintf("keyboard_post_init_kb done\n");
 }
 
 #if SPLIT_KEYBOARD

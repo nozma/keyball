@@ -164,6 +164,7 @@ static uint16_t type_count = 0;
 void count_type(void) {
     type_count++;
 }
+#ifndef CUSTOM_OLED_SKIP_PROCESS_RECORD
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef OLED_ENABLE
     if (record->event.pressed) {
@@ -172,6 +173,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
     return true;
 }
+#endif
 
 // WPM, type count表示
 static void print_wpm_type_count(void) {

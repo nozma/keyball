@@ -203,37 +203,28 @@ bool pmw3360_motion_burst(pmw3360_motion_t *d) {
 }
 
 bool pmw3360_init(void) {
-    uprintf("pmw_debug: spi_init\n");
     pmw3360_spi_init();
 
-    uprintf("pmw_debug: spi_start\n");
     bool ok = pmw3360_spi_start();
-    uprintf("pmw_debug: spi_start returned %d\n", ok);
     if (!ok) {
-        uprintf("pmw_debug: spi_start failed\n");
         return false;
     }
 
-    uprintf("pmw_debug: reset\n");
     pmw3360_reg_write(pmw3360_Power_Up_Reset, 0x5a);
     wait_ms(50);
 
-    uprintf("pmw_debug: clear regs\n");
     pmw3360_reg_read(pmw3360_Motion);
     pmw3360_reg_read(pmw3360_Delta_X_L);
     pmw3360_reg_read(pmw3360_Delta_X_H);
     pmw3360_reg_read(pmw3360_Delta_Y_L);
     pmw3360_reg_read(pmw3360_Delta_Y_H);
 
-    uprintf("pmw_debug: config2\n");
     pmw3360_reg_write(pmw3360_Config2, 0x00);
 
-    uprintf("pmw_debug: read pid\n");
     uint8_t pid = pmw3360_reg_read(pmw3360_Product_ID);
     uint8_t rev = pmw3360_reg_read(pmw3360_Revision_ID);
     PMW_SPI_STOP();
 
-    uprintf("pmw_debug: pid=%02X rev=%02X\n", pid, rev);
     return pid == 0x42 && rev == 0x01;
 }
 

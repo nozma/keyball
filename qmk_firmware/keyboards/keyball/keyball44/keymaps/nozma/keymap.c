@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #include "quantum.h"
-#include "gpio.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -63,13 +62,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-void matrix_init_user(void) {
-    debug_enable = true;
-    setPinOutput(GP25);
-    writePinHigh(GP25);
-    uprintf("nozma matrix_init\n");
-}
-
 layer_state_t layer_state_set_user(layer_state_t state) {
     // Auto enable scroll mode when the highest layer is 3
     keyball_set_scroll_mode(get_highest_layer(state) == 3);
@@ -103,7 +95,6 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         keyball_oled_render_mymain();
-        oled_write_P(PSTR("nozma"), false);
     } else {
         draw_bongo(false);
     }

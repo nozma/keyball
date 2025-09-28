@@ -17,17 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#ifdef BONGO_ENABLE
+#    include "bongo.h"
+#endif
+
 #include "quantum.h"
-#include "gpio.h"
 #include "dynamic_keymap.h"
 #include "eeconfig.h"
-#include "print.h"
 #ifdef VIAL_ENABLE
 #    include "raw_hid.h"
 #    include "quantum/vial.h"
-#endif
-#ifdef VIAL_ENABLE
-extern int vial_unlocked;
 #endif
 
 // clang-format off
@@ -69,13 +68,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-void matrix_init_user(void) {
-    debug_enable = true;
-    setPinOutput(GP25);
-    writePinHigh(GP25);
-    uprintf("matrix_init_user start\n");
-}
-
 layer_state_t layer_state_set_user(layer_state_t state) {
     // Auto enable scroll mode when the highest layer is 3
     keyball_set_scroll_mode(get_highest_layer(state) == 3);
@@ -85,43 +77,41 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 void keyboard_post_init_user(void) {
     if (!eeconfig_is_enabled()) {
         eeconfig_init();
-        uprintf("eeconfig init triggered\n");
     }
 
 #ifdef VIAL_ENABLE
     vial_init();
 #endif
-    uprintf("keyboard_post_init_user done\n");
 }
 
 #ifdef OLED_ENABLE
-bool oled_task_user(void) {
-    oled_clear();
-    oled_set_cursor(0, 0);
-    oled_write_P(PSTR("Vial Debug"), false);
-    oled_set_cursor(0, 1);
-    oled_write_P(is_keyboard_master() ? PSTR("MASTER") : PSTR("SLAVE"), false);
-#ifdef VIAL_ENABLE
-    oled_set_cursor(0, 2);
-    oled_write_P(vial_unlocked ? PSTR("UNLOCK") : PSTR("LOCK"), false);
-#endif
-    return false;
-}
-#endif
+#    include "lib/oledkit/oledkit.h"
+#    define CUSTOM_OLED_SKIP_PROCESS_RECORD
+#    include "custom_oled.c"
+#    undef CUSTOM_OLED_SKIP_PROCESS_RECORD
 
-void matrix_scan_user(void) {
-    static uint32_t count = 0;
-    if (count < 10) {
-#ifdef VIAL_ENABLE
-        uprintf("tick%lu master=%d unlocked=%d\n", (unsigned long)count, is_keyboard_master(), vial_unlocked);
-#else
-        uprintf("tick%lu master=%d\n", (unsigned long)count, is_keyboard_master());
-#endif
-        count++;
-    }
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_270;
 }
+
+bool oled_task_user(void) {
+    if (is_keyboard_master()) {
+        keyball_oled_render_mymain();
+    } else {
+#    ifdef BONGO_ENABLE
+        draw_bongo(false);
+#    endif
+    }
+    return true;
+}
+#endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef OLED_ENABLE
+    if (record->event.pressed) {
+        count_type();
+    }
+#endif
 #ifdef VIAL_ENABLE
     if (!process_record_vial(keycode, record)) {
         return false;

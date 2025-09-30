@@ -23,14 +23,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-          python -m pip install --upgrade pip
-          python -m pip install qmk
-          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
+          python3 -m pip install --user --upgrade pip qmk
+          echo "$(python3 -m site --user-base)/bin" >> $GITHUB_PATH
+          export PATH="$(python3 -m site --user-base)/bin:$PATH"
           qmk --version
 
       - name: Setup QMK workspace
         run: |
           qmk setup -H "$GITHUB_WORKSPACE/.qmk_work" --branch master --yes
+          python3 -m pip install --user -r "$GITHUB_WORKSPACE/.qmk_work/requirements.txt"
 
       - name: Overlay Keyball sources
         run: |

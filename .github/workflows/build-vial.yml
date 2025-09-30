@@ -14,6 +14,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      QMK_HOME: ${{ github.workspace }}/qmk_firmware
 
     steps:
       - name: Checkout repository
@@ -26,33 +28,21 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Prepare build tree
+      - name: Install build dependencies
         run: |
-          git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
-          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
-
-      - name: Install QMK CLI and dependencies
-        run: |
-          cd .qmk_work
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           python -m pip install --upgrade pip
-          python -m pip install qmk
-          python -m pip install -r requirements.txt
+          python -m pip install -r qmk_firmware/requirements.txt
 
       - name: Build Keyball44 Vial firmware
         run: |
-          cd .qmk_work
-          make keyball/keyball44:vial
+          make -C qmk_firmware keyball/keyball44:vial
 
       - name: Collect artifact
         run: |
           mkdir -p artifacts
-          UF2_PATH=$(find .qmk_work -maxdepth 4 -type f -name 'keyball_keyball44_vial.uf2' | head -n 1)
-          if [ -z "$UF2_PATH" ]; then
-            echo "Firmware UF2 not found" >&2
-            find .qmk_work -maxdepth 4 -type f -name '*.uf2' -print
-            exit 1
-          fi
-          cp "$UF2_PATH" artifacts/
+          cp qmk_firmware/.build/keyball_keyball44_vial.uf2 artifacts/
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4

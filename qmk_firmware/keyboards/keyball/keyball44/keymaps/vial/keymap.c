@@ -29,62 +29,111 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    include "quantum/vial.h"
 #endif
 
+enum custom_keycodes {
+    USER00 = KEYBALL_SAFE_RANGE,
+};
+
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  // keymap for default (VIA)
   [0] = LAYOUT_universal(
-    KC_ESC   , KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                                        KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     , KC_DEL   ,
-    KC_TAB   , KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                                        KC_H     , KC_J     , KC_K     , KC_L     , KC_SCLN  , S(KC_7)  ,
-    KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_B     ,                                        KC_N     , KC_M     , KC_COMM  , KC_DOT   , KC_SLSH  , KC_INT1  ,
-              KC_LALT,KC_LGUI,LCTL_T(KC_LNG2)     ,LT(1,KC_SPC),LT(3,KC_LNG1),                  KC_BSPC,LT(2,KC_ENT), RCTL_T(KC_LNG2),     KC_RALT  , KC_PSCR
+    KC_TAB   , KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                                        KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     , KC_RBRC  ,
+    KC_LCTL  , LT(3,KC_A), KC_S     , KC_D     , KC_F     , KC_G     ,                                        KC_H     , KC_J     , KC_K     , LT(4,KC_L), LT(4,KC_SCLN), KC_NUHS  ,
+    KC_LSFT  , LSFT_T(KC_Z), KC_X   , KC_C     , KC_V     , KC_B     ,                                        KC_N     , KC_M     , KC_COMMA , KC_DOT   , RSFT_T(KC_SLSH), KC_INT1  ,
+              KC_F12   , KC_NO    , KC_LALT  , LT(1,KC_LNG2), LT(5,KC_ENTER),                  LT(6,KC_SPACE), LT(2,KC_LNG1), RCTL_T(KC_LNG2), KC_RALT  , QK_MACRO_0
   ),
 
   [1] = LAYOUT_universal(
-    SSNP_FRE ,  KC_F1   , KC_F2    , KC_F3   , KC_F4    , KC_F5    ,                                         KC_F6    , KC_F7    , KC_F8    , KC_F9    , KC_F10   , KC_F11   ,
-    SSNP_VRT ,  _______ , _______  , KC_UP   , KC_ENT   , KC_DEL   ,                                         KC_PGUP  , KC_BTN1  , KC_UP    , KC_BTN2  , KC_BTN3  , KC_F12   ,
-    SSNP_HOR ,  _______ , KC_LEFT  , KC_DOWN , KC_RGHT  , KC_BSPC  ,                                         KC_PGDN  , KC_LEFT  , KC_DOWN  , KC_RGHT  , _______  , _______  ,
-                  _______  , _______ , _______  ,         _______  , _______  ,                   _______  , _______  , _______       , _______  , _______
+    KC_TRNS , KC_ESC  , LGUI(KC_W), LGUI(KC_E), LGUI(KC_R), LGUI(KC_T),                                        S(KC_6)  , S(KC_7)  , S(KC_8)  , S(KC_9)  , KC_MINS , KC_TRNS ,
+    KC_TRNS , LGUI(KC_A), LGUI(KC_S), LGUI(KC_D), LGUI(KC_F), LGUI(KC_G),                                        LGUI(KC_H), LGUI(KC_J), LGUI(KC_K), LGUI(KC_L), KC_EQUAL , KC_TRNS ,
+    KC_TRNS , LGUI(KC_Z), LGUI(KC_X), LGUI(KC_C), LGUI(KC_V), LGUI(KC_B),                                        LGUI(KC_N), LGUI(KC_M), LGUI(KC_COMMA), LGUI(KC_DOT), RSFT_T(KC_INT3), KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , LGUI(KC_ENTER),                  LGUI(KC_SPACE), KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
 
   [2] = LAYOUT_universal(
-    _______  ,S(KC_QUOT), KC_7     , KC_8    , KC_9     , S(KC_8)  ,                                         S(KC_9)  , S(KC_1)  , S(KC_6)  , KC_LBRC  , S(KC_4)  , _______  ,
-    _______  ,S(KC_SCLN), KC_4     , KC_5    , KC_6     , KC_RBRC  ,                                         KC_NUHS  , KC_MINS  , S(KC_EQL), S(KC_3)  , KC_QUOT  , S(KC_2)  ,
-    _______  ,S(KC_MINS), KC_1     , KC_2    , KC_3     ,S(KC_RBRC),                                        S(KC_NUHS),S(KC_INT1), KC_EQL   ,S(KC_LBRC),S(KC_SLSH),S(KC_INT3),
-                  KC_0     , KC_DOT  , _______  ,         _______  , _______  ,                   KC_DEL   , _______  , _______       , _______  , _______
+    KC_TRNS , KC_1     , KC_2     , KC_3     , KC_4     , KC_5     ,                                        KC_6     , KC_7     , KC_8     , KC_9     , KC_0     , KC_TRNS ,
+    KC_TRNS , KC_F1    , KC_F2    , KC_F3    , KC_F4    , KC_5     ,                                        KC_LEFT  , KC_DOWN  , KC_UP    , KC_RGHT  , KC_QUOT , KC_TRNS ,
+    KC_TRNS , KC_LSFT , KC_F6    , KC_F7    , KC_F8    , KC_F9    ,                                        KC_F10   , KC_F11   , KC_F12   , KC_NO    , KC_RSFT , KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                  KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
 
   [3] = LAYOUT_universal(
-    RGB_TOG  , AML_TO   , AML_I50  , AML_D50  , _______  , _______  ,                                        RGB_M_P  , RGB_M_B  , RGB_M_R  , RGB_M_SW , RGB_M_SN , RGB_M_K  ,
-    RGB_MOD  , RGB_HUI  , RGB_SAI  , RGB_VAI  , _______  , SCRL_DVI ,                                        RGB_M_X  , RGB_M_G  , RGB_M_T  , RGB_M_TW , _______  , _______  ,
-    RGB_RMOD , RGB_HUD  , RGB_SAD  , RGB_VAD  , _______  , SCRL_DVD ,                                        CPI_D1K  , CPI_D100 , CPI_I100 , CPI_I1K  , _______  , KBC_SAVE ,
-                  QK_BOOT  , KBC_RST  , _______  ,        _______  , _______  ,                   _______  , _______  , _______       , KBC_RST  , QK_BOOT
+    KC_TRNS , LCTL(KC_Q), LCTL(KC_W), LGUI(KC_RIGHT), LCTL(KC_R), LCTL(KC_T),                                        LCTL(KC_Y), LCTL(KC_U), LCTL(KC_I), LCTL(KC_O), KC_UP    , KC_TRNS ,
+    KC_TRNS , KC_NO    , LCTL(KC_A), KC_DELETE     , KC_RGHT  , LCTL(KC_F),                                        KC_BSPC  , LCTL(KC_J), LCTL(KC_K), LCTL(KC_L), LCTL(KC_SCLN), KC_TRNS ,
+    KC_TRNS , LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C)   , LCTL(KC_V), KC_LEFT ,                                        KC_DOWN   , LCTL(KC_M), LCTL(KC_COMMA), LCTL(KC_DOT), LCTL(KC_SLSH), KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , LCTL(KC_ENT) ,                  LCTL(KC_SPC) , KC_TRNS , KC_TRNS , USER00 , KC_TRNS
   ),
+
   [4] = LAYOUT_universal(
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-                  _______  , _______ , _______  ,        _______  , _______  ,                   _______  , _______  , _______       , _______  , _______
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        LCTL(KC_NUHS) , LCTL(G(KC_I)), 0x00C1    , S(KC_L)   , KC_TRNS , KC_TRNS ,
+    KC_TRNS , KC_LCTL , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        S(KC_H)     , KC_BTN1 , KC_BTN2 , KC_TRNS , KC_TRNS , KC_TRNS ,
+    KC_TRNS , KC_LSFT , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS     , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                  KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
+
   [5] = LAYOUT_universal(
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-                  _______  , _______ , _______  ,        _______  , _______  ,                   _______  , _______  , _______       , _______  , _______
+    KC_TRNS , KC_ESC  , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , S(KC_RBRC) , KC_RBRC , KC_TRNS ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , S(KC_NUHS) , KC_NUHS , KC_TRNS ,
+    KC_TRNS , KC_LSFT , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , KC_TRNS , S(KC_INT3), KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                  KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
+
   [6] = LAYOUT_universal(
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-                  _______  , _______ , _______  ,        _______  , _______  ,                   _______  , _______  , _______       , _______  , _______
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , S(KC_LBRC) , KC_LBRC , KC_TRNS ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , KC_TRNS   , S(KC_QUOT), KC_TRNS ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , KC_TRNS   , KC_INT1 , KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                  KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
+
   [7] = LAYOUT_universal(
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-    _______  , _______  , _______  , _______  , _______  , _______  ,                                        _______  , _______  , _______  , _______  , _______  , _______  ,
-                  _______  , _______ , _______  ,        _______  , _______  ,                   _______  , _______  , _______       , _______  , _______
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                                        KC_TRNS   , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,
+              KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                  KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
 };
 // clang-format on
+
+#ifdef VIAL_COMBO_ENABLE
+static void load_default_combos(void) {
+    const struct {
+        uint16_t input[4];
+        uint16_t output;
+    } defaults[] = {
+        {{KC_Q, KC_W, KC_NO, KC_NO}, KC_TAB},
+        {{KC_BTN1, KC_BTN2, KC_NO, KC_NO}, KC_BTN3},
+        {{LGUI(KC_Z), LGUI(KC_X), KC_NO, KC_NO}, SGUI(KC_Z)},
+        {{KC_NO, KC_NO, KC_NO, KC_NO}, KC_NO},
+    };
+
+    vial_combo_entry_t entry;
+    for (size_t i = 0; i < VIAL_COMBO_ENTRIES && i < (sizeof(defaults) / sizeof(defaults[0])); ++i) {
+        if (dynamic_keymap_get_combo(i, &entry) != 0) {
+            continue;
+        }
+
+        bool empty = (entry.output == KC_NO);
+        if (!empty) {
+            for (size_t k = 0; k < 4; ++k) {
+                if (entry.input[k] != KC_NO) {
+                    empty = false;
+                    break;
+                }
+            }
+        }
+
+        if (!empty) {
+            continue;
+        }
+
+        vial_combo_entry_t def = {0};
+        for (size_t k = 0; k < 4; ++k) {
+            def.input[k] = defaults[i].input[k];
+        }
+        def.output = defaults[i].output;
+        dynamic_keymap_set_combo(i, &def);
+    }
+}
+#endif
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     // Auto enable scroll mode when the highest layer is 3
@@ -98,6 +147,9 @@ void keyboard_post_init_user(void) {
     }
 
 #ifdef VIAL_ENABLE
+#    ifdef VIAL_COMBO_ENABLE
+    load_default_combos();
+#    endif
     vial_init();
 #endif
 }
@@ -135,6 +187,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return false;
     }
 #endif
+
+    switch (keycode) {
+        case QK_MACRO_0:
+            if (record->event.pressed) {
+                const uint8_t mods = MOD_BIT(KC_LGUI) | MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT);
+                register_mods(mods);
+                tap_code(KC_4);
+                unregister_mods(mods);
+            }
+            return false;
+    }
+
     return true;
 }
 

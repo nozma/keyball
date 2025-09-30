@@ -68,7 +68,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VIAL_UNLOCK_COMBO_ROWS { 0, 4 }
 #define VIAL_UNLOCK_COMBO_COLS { 0, 5 }
 
-#define TAP_CODE_DELAY 5
+#define TAP_CODE_DELAY 0
 
 //#define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 //#define AUTO_MOUSE_DEFAULT_LAYER 1

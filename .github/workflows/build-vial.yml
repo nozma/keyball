@@ -27,17 +27,18 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install QMK dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r qmk_firmware/requirements.txt
-
       - name: Prepare build tree
         run: |
           git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
           rsync -a qmk_firmware/keyboards/keyball/keyball44/keymaps/vial/ .qmk_work/keyboards/keyball/keyball44/keymaps/vial/
           rsync -a qmk_firmware/keyboards/keyball/keyball44/keymap.c .qmk_work/keyboards/keyball/keyball44/
           rsync -a qmk_firmware/keyboards/keyball/keyball44/config.h .qmk_work/keyboards/keyball/keyball44/
+
+      - name: Install QMK dependencies
+        run: |
+          cd .qmk_work
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Build Keyball44 Vial firmware
         run: |

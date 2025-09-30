@@ -25,19 +25,20 @@ jobs:
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           python -m pip install --upgrade pip
           python -m pip install qmk
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
           qmk --version
 
-      - name: Prepare QMK workspace
+      - name: Setup QMK environment
         run: |
-          git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
-          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
-          python -m pip install -r .qmk_work/requirements.txt
+          qmk setup -H "$GITHUB_WORKSPACE/.qmk_work" --branch master --yes
 
-      - name: Build Keyball44 Vial firmware
+      - name: Overlay Keyball sources
         run: |
-          cd .qmk_work
-          make keyball/keyball44:vial
+          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
+
+      - name: Compile Keyball44 Vial firmware
+        run: |
+          qmk compile -kb keyball/keyball44 -km vial
 
       - name: Locate firmware artifact
         id: locate

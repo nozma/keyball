@@ -19,32 +19,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install build toolchain and QMK CLI
+      - name: Install build toolchain
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           python -m pip install --upgrade pip
-          python -m pip install qmk
-          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
-          qmk --version
 
-      - name: Setup QMK workspace
+      - name: Prepare QMK workspace
         run: |
           git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
-          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
+          rsync -a qmk_firmware/ .qmk_work/
           python -m pip install -r .qmk_work/requirements.txt
 
       - name: Compile Keyball44 Vial firmware
         run: |
-          qmk compile -H "$GITHUB_WORKSPACE/.qmk_work" -kb keyball/keyball44 -km vial
+          cd .qmk_work
+          make SKIP_GIT=yes keyball/keyball44:vial
 
       - name: Locate firmware artifact
         id: locate
         run: |
-          UF2_PATH=$(find .qmk_work -maxdepth 6 -type f -name 'keyball_keyball44_vial.uf2' -print -quit)
+          UF2_PATH=$(find .qmk_work -maxdepth 2 -type f -name 'keyball_keyball44_vial.uf2' -print -quit)
           if [ -z "$UF2_PATH" ]; then
             echo "Failed to locate UF2 artifact" >&2
-            find .qmk_work -maxdepth 6 -type f -name '*.uf2' -print
+            find .qmk_work -maxdepth 2 -type f -name '*.uf2' -print
             exit 1
           fi
           echo "UF2_PATH=$UF2_PATH" >> "$GITHUB_OUTPUT"

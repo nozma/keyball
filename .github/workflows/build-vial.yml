@@ -14,19 +14,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      QMK_HOME: ${{ github.workspace }}/.qmk_work
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install build toolchain
+      - name: Install build toolchain and QMK CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           python -m pip install --upgrade pip
           python -m pip install qmk
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          qmk --version
 
       - name: Prepare QMK workspace
         run: |

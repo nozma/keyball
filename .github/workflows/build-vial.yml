@@ -46,15 +46,13 @@ jobs:
       - name: Collect artifact
         run: |
           mkdir -p artifacts
-          if [ -f .qmk_work/.build/keyball_keyball44_vial.uf2 ]; then
-            cp .qmk_work/.build/keyball_keyball44_vial.uf2 artifacts/
-          elif [ -f .qmk_work/keyball_keyball44_vial.uf2 ]; then
-            cp .qmk_work/keyball_keyball44_vial.uf2 artifacts/
-          else
-            echo "UF2 output not found" >&2
-            ls -R .qmk_work/.build || true
+          UF2_PATH=$(find .qmk_work -maxdepth 4 -type f -name 'keyball_keyball44_vial.uf2' | head -n 1)
+          if [ -z "$UF2_PATH" ]; then
+            echo "Firmware UF2 not found" >&2
+            find .qmk_work -maxdepth 4 -type f -name '*.uf2' -print
             exit 1
           fi
+          cp "$UF2_PATH" artifacts/
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4

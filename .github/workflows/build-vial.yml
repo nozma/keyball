@@ -28,17 +28,15 @@ jobs:
           echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
           qmk --version
 
-      - name: Setup QMK environment
+      - name: Setup QMK workspace
         run: |
-          qmk setup -H "$GITHUB_WORKSPACE/.qmk_work" --branch master --yes
-
-      - name: Overlay Keyball sources
-        run: |
+          git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
           rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
+          python -m pip install -r .qmk_work/requirements.txt
 
       - name: Compile Keyball44 Vial firmware
         run: |
-          qmk compile -kb keyball/keyball44 -km vial
+          qmk compile -H "$GITHUB_WORKSPACE/.qmk_work" -kb keyball/keyball44 -km vial
 
       - name: Locate firmware artifact
         id: locate

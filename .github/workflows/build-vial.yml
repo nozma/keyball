@@ -39,9 +39,20 @@ jobs:
           cd .qmk_work
           make keyball/keyball44:vial
 
+      - name: Locate firmware artifact
+        id: locate
+        run: |
+          UF2_PATH=$(find .qmk_work -maxdepth 6 -type f -name 'keyball_keyball44_vial.uf2' -print -quit)
+          if [ -z "$UF2_PATH" ]; then
+            echo "Failed to locate UF2 artifact" >&2
+            find .qmk_work -maxdepth 6 -type f -name '*.uf2' -print
+            exit 1
+          fi
+          echo "UF2_PATH=$UF2_PATH" >> "$GITHUB_OUTPUT"
+
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
           name: keyball44-vial-uf2
-          path: .qmk_work/.build/keyball_keyball44_vial.uf2
+          path: ${{ steps.locate.outputs.UF2_PATH }}
           if-no-files-found: error

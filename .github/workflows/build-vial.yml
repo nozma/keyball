@@ -36,9 +36,10 @@ jobs:
         run: |
           rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
 
-      - name: Compile Keyball44 Vial firmware
+      - name: Build Keyball44 Vial firmware
         run: |
-          QMK_HOME="$GITHUB_WORKSPACE/.qmk_work" qmk compile -kb keyball/keyball44 -km vial
+          cd .qmk_work
+          make SKIP_GIT=yes keyball/keyball44:vial
 
       - name: Locate firmware artifact
         id: locate

@@ -14,42 +14,37 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      QMK_HOME: ${{ github.workspace }}/qmk_firmware
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install build dependencies
+      - name: Install build toolchain
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           python -m pip install --upgrade pip
-          python -m pip install qmk
-          if [ -f qmk_firmware/requirements.txt ]; then
-            python -m pip install -r qmk_firmware/requirements.txt
-          fi
+
+      - name: Prepare QMK workspace
+        run: |
+          git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
+          mkdir -p .qmk_work/keyboards/keyball
+          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
+          python -m pip install -r .qmk_work/requirements.txt
 
       - name: Build Keyball44 Vial firmware
         run: |
-          make -C qmk_firmware keyball/keyball44:vial
-
-      - name: Collect artifact
-        run: |
-          mkdir -p artifacts
-          cp qmk_firmware/.build/keyball_keyball44_vial.uf2 artifacts/
+          cd .qmk_work
+          make keyball/keyball44:vial
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
           name: keyball44-vial-uf2
-          path: artifacts/keyball_keyball44_vial.uf2
+          path: .qmk_work/.build/keyball_keyball44_vial.uf2
           if-no-files-found: error

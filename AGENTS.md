@@ -28,7 +28,10 @@
 - `qmk_firmware/` 直下に `builddefs/` や `drivers/` などのフル QMK ソースを展開しない。生成されてしまった場合でも `.gitignore` 済みなのでコミットしない。
 
 ## ビルドメモ
-- 実際のビルドは `.qmk_work/` 以下の QMK ツリーで行う。`qmk_firmware/` 側を編集したら、ビルド前に `rsync -a qmk_firmware/<path> .qmk_work/<path>` で該当ファイルを同期する。
+- 実際のビルドは `.qmk_work/` 以下の QMK ツリーで行う。
+- `qmk_firmware/` 側でファイルを編集したら、ビルド前に必ず同期する。
+  1. 同期対象が単体ファイルの場合は `rsync -a qmk_firmware/<path>/ keymap destination` を用いる（例：`rsync -a qmk_firmware/keyboards/keyball/keyball44/keymaps/vial/ .qmk_work/keyboards/keyball/keyball44/keymaps/vial/`）。
+  2. 複数ファイルをまとめて更新した場合も同様にディレクトリ単位で同期し、`.qmk_work` 側を最新化してからビルドする。
 - ビルドコマンドは `.qmk_work` ディレクトリで `make keyball/keyball44:vial` を使用する。`qmk compile` は設定が噛み合わず失敗するため現状は非推奨。
 - ビルド中に `keyboard.json` などに関する警告が出るが、Keyball 用カスタム構成では既知であり無視してよい。
 - 生成物は `.qmk_work/.build/keyball_keyball44_vial.uf2` に出力される。必要に応じてコピーして実機へ書き込む。

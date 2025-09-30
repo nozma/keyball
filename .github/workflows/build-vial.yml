@@ -38,7 +38,7 @@ jobs:
 
       - name: Compile Keyball44 Vial firmware
         run: |
-          qmk -H "$GITHUB_WORKSPACE/.qmk_work" compile -kb keyball/keyball44 -km vial
+          QMK_HOME="$GITHUB_WORKSPACE/.qmk_work" qmk compile -kb keyball/keyball44 -km vial
 
       - name: Locate firmware artifact
         id: locate

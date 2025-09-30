@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - vial-layout-update
+      - workflow-artifact-fix
   pull_request:
     paths:
       - 'qmk_firmware/keyboards/keyball/keyball44/**'
@@ -43,8 +43,22 @@ jobs:
           cd .qmk_work
           make keyball/keyball44:vial
 
+      - name: Collect artifact
+        run: |
+          mkdir -p artifacts
+          if [ -f .qmk_work/.build/keyball_keyball44_vial.uf2 ]; then
+            cp .qmk_work/.build/keyball_keyball44_vial.uf2 artifacts/
+          elif [ -f .qmk_work/keyball_keyball44_vial.uf2 ]; then
+            cp .qmk_work/keyball_keyball44_vial.uf2 artifacts/
+          else
+            echo "UF2 output not found" >&2
+            ls -R .qmk_work/.build || true
+            exit 1
+          fi
+
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
           name: keyball44-vial-uf2
-          path: .qmk_work/.build/keyball_keyball44_vial.uf2
+          path: artifacts/keyball_keyball44_vial.uf2
+          if-no-files-found: error

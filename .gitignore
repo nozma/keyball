@@ -9,3 +9,5 @@ qmk_firmware/quantum/
 qmk_firmware/util/
 *.uf2
 *.hex
+
+.vscode/settings.json

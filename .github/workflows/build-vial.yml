@@ -14,6 +14,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      QMK_HOME: ${{ github.workspace }}/.qmk_work
 
     steps:
       - name: Checkout repository
@@ -30,25 +32,39 @@ jobs:
 
       - name: Setup QMK workspace
         run: |
-          qmk setup -H "$GITHUB_WORKSPACE/.qmk_work" --branch master --yes
-          python3 -m pip install --user -r "$GITHUB_WORKSPACE/.qmk_work/requirements.txt"
+          qmk setup -H "$QMK_HOME" --branch master --yes
+          python3 -m pip install --user -r "$QMK_HOME/requirements.txt"
 
       - name: Overlay Keyball sources
         run: |
-          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
+          QMK_ROOT="$QMK_HOME"
+          if [ -d "$QMK_ROOT/qmk_firmware" ]; then
+            QMK_ROOT="$QMK_ROOT/qmk_firmware"
+          fi
+          mkdir -p "$QMK_ROOT/keyboards/keyball"
+          rsync -a qmk_firmware/keyboards/keyball/ "$QMK_ROOT/keyboards/keyball/"
+          mkdir -p "$QMK_ROOT/drivers"
+          rsync -a qmk_firmware/drivers/ "$QMK_ROOT/drivers/"
 
       - name: Build Keyball44 Vial firmware
         run: |
-          cd .qmk_work
-          make SKIP_GIT=yes keyball/keyball44:vial
+          QMK_ROOT="$QMK_HOME"
+          if [ -d "$QMK_ROOT/qmk_firmware" ]; then
+            QMK_ROOT="$QMK_ROOT/qmk_firmware"
+          fi
+          make -C "$QMK_ROOT" SKIP_GIT=yes keyball/keyball44:vial
 
       - name: Locate firmware artifact
         id: locate
         run: |
-          UF2_PATH=$(find .qmk_work -maxdepth 6 -type f -name 'keyball_keyball44_vial.uf2' -print -quit)
+          QMK_ROOT="$QMK_HOME"
+          if [ -d "$QMK_ROOT/qmk_firmware" ]; then
+            QMK_ROOT="$QMK_ROOT/qmk_firmware"
+          fi
+          UF2_PATH=$(find "$QMK_ROOT" -maxdepth 6 -type f -name 'keyball_keyball44_vial.uf2' -print -quit)
           if [ -z "$UF2_PATH" ]; then
             echo "Failed to locate UF2 artifact" >&2
-            find .qmk_work -maxdepth 6 -type f -name '*.uf2' -print
+            find "$QMK_ROOT" -maxdepth 6 -type f -name '*.uf2' -print
             exit 1
           fi
           echo "UF2_PATH=$UF2_PATH" >> "$GITHUB_OUTPUT"

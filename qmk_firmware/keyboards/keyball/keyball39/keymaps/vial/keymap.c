@@ -24,6 +24,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "quantum.h"
 #include "dynamic_keymap.h"
 #include "eeconfig.h"
+#ifdef VIA_ENABLE
+#    include "via.h"
+#endif
+#ifdef QMK_SETTINGS
+#    include "qmk_settings.h"
+#endif
 #ifdef VIAL_ENABLE
 #    include "raw_hid.h"
 #    include "quantum/vial.h"
@@ -33,6 +39,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum custom_keycodes {
     USER00 = KEYBALL_SAFE_RANGE,
 };
+
+#ifdef VIA_ENABLE
+// EEPROM 初期化直後に Vial 設定へ反映したい項目がある場合のフラグ
+// 今回は Ignore Mod Tap Interrupt を ON、Quick Tap Term を 0 にするために使用する。
+static bool needs_tapping_defaults = false;
+
+void via_init_kb(void) {
+    needs_tapping_defaults = !via_eeprom_is_valid();
+}
+#endif
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -152,6 +168,15 @@ void keyboard_post_init_user(void) {
     load_default_combos();
 #    endif
     vial_init();
+#endif
+
+#if defined(QMK_SETTINGS) && defined(VIA_ENABLE)
+    if (is_keyboard_master() && needs_tapping_defaults) {
+        // QS.tapping のビット1=Ignore Mod Tap Interrupt ON、ビット2=Quick Tap Term を 0 に設定
+        uint8_t tapping_flags = QS.tapping | 0x02 | 0x04;
+        qmk_settings_set(8, &tapping_flags, sizeof(tapping_flags));
+        needs_tapping_defaults = false;
+    }
 #endif
 }
 

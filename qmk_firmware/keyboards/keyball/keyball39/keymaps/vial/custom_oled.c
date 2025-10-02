@@ -1,5 +1,6 @@
 #include QMK_KEYBOARD_H
 
+
 // ヘッダタイトル
 static const char PROGMEM img_title[] = {
 	0x3e, 0x63, 0x41, 0x00, 0x7c, 0x14, 0x18, 0x00, 0x74, 0x00, 0x00, 0x7f, 0x41, 0x22, 0x1c, 0x00, 
@@ -189,6 +190,7 @@ static void print_wpm_type_count(void) {
     itoa(type_count, type_count_str, 10);
     oled_write_ln(type_count_str, false);
 }
+
 
 // デフォルトページ表示
 static void render_default(void) {

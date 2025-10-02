@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    include "quantum/vial.h"
 #endif
 
+
 enum custom_keycodes {
     USER00 = KEYBALL_SAFE_RANGE,
 };
@@ -243,18 +244,18 @@ led_config_t g_led_config = {
     { 17, 43}, // 15
     { 17, 64}, // 16
     { 17, 85}, // 17
-    { 0, 0},   // 18
-    { 0, 0},   // 19
-    { 0, 0},   // 20
-    { 0, 0},   // 21
+    { 69, 21}, // 18 (under near 3)
+    { 17, 21}, // 19 (under near 14)
+    { 17, 64}, // 20 (under near 16)
+    { 52, 64}, // 21 (under near 8)
     { 86, 85}, // 22
     { 103, 85}, // 23
     { 155, 85}, // 24
     { 172, 85}, // 25
-    { 0, 0}, // 26
-    { 0, 0}, // 27
-    { 0, 0}, // 28
-    { 0, 0}, // 29
+    { 198, 64}, // 26 (under near 39, 42)
+    { 241, 85}, // 27 (under near 32)
+    { 241, 21}, // 28 (under near 30)
+    { 190, 21}, // 29 (under near 40)
     { 241, 21}, // 30
     { 241, 43}, // 31
     { 241, 64}, // 32
@@ -294,18 +295,18 @@ led_config_t g_led_config = {
     LED_FLAG_KEYLIGHT, //15
     LED_FLAG_KEYLIGHT, //16
     LED_FLAG_KEYLIGHT, //17
-    LED_FLAG_NONE,     //18
-    LED_FLAG_NONE,     //19
-    LED_FLAG_NONE,     //20
-    LED_FLAG_NONE,     //21
+    LED_FLAG_KEYLIGHT, //18
+    LED_FLAG_KEYLIGHT, //19
+    LED_FLAG_KEYLIGHT, //20
+    LED_FLAG_KEYLIGHT, //21
     LED_FLAG_KEYLIGHT, //22
     LED_FLAG_KEYLIGHT, //23
     LED_FLAG_KEYLIGHT, //24
     LED_FLAG_KEYLIGHT, //25
-    LED_FLAG_NONE,     //26
-    LED_FLAG_NONE,     //27
-    LED_FLAG_NONE,     //28
-    LED_FLAG_NONE,     //29            
+    LED_FLAG_KEYLIGHT, //26
+    LED_FLAG_KEYLIGHT, //27
+    LED_FLAG_KEYLIGHT, //28
+    LED_FLAG_KEYLIGHT, //29
     LED_FLAG_KEYLIGHT, //30
     LED_FLAG_KEYLIGHT, //31
     LED_FLAG_KEYLIGHT, //32

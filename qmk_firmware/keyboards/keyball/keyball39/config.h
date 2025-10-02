@@ -29,9 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Split parameters
 #define SOFT_SERIAL_PIN         GP1
-#define SPLIT_HAND_MATRIX_GRID  GP26, GP4
+#define SPLIT_HAND_MATRIX_GRID       GP26, GP4
 #define SPLIT_HAND_MATRIX_GRID_LOW_IS_LEFT
 #define SPLIT_USB_DETECT
+#define MASTER_RIGHT
 #ifdef OLED_ENABLE
 #    define SPLIT_OLED_ENABLE
 #endif

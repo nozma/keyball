@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 
 #include "lib/keyball/keyball.h"
+#ifdef RGB_MATRIX_ENABLE
+#    include "rgb_matrix.h"
+#endif
+#ifdef SPLIT_KEYBOARD
+#    include "split_util.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -44,3 +50,16 @@ void keyball_on_adjust_layout(keyball_adjust_t v) {
     rgblight_set_effect_range(0, lednum_this + lednum_that);
 #endif
 }
+
+#ifdef SPLIT_KEYBOARD
+bool is_keyboard_master_impl(void);
+bool is_keyboard_master(void);
+
+bool is_keyboard_left_impl(void) {
+    return !is_keyboard_master_impl();
+}
+
+bool is_keyboard_left(void) {
+    return !is_keyboard_master();
+}
+#endif

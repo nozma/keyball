@@ -1,16 +1,18 @@
 # MCU name
-MCU = atmega32u4
+#MCU = atmega32u4
+MCU = RP2040
 
 # Bootloader selection
-BOOTLOADER = caterina
+#BOOTLOADER = caterina
+BOOTLOADER = rp2040
 
 # Link Time Optimization required for size.
 LTO_ENABLE = yes
 
 # Build Options
 BOOTMAGIC_ENABLE = no       # Enable Bootmagic Lite
-EXTRAKEY_ENABLE = no        # Audio control and System control
-CONSOLE_ENABLE = no         # Console for debug
+EXTRAKEY_ENABLE = yes        # Audio control and System control
+CONSOLE_ENABLE = yes         # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 NKRO_ENABLE = no            # Enable N-Key Rollover
 BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
@@ -31,7 +33,6 @@ MOUSEKEY_ENABLE = no
 # Enabled only one of RGBLIGHT and RGB_MATRIX if necessary.
 RGBLIGHT_ENABLE = no        # Enable RGBLIGHT
 RGB_MATRIX_ENABLE = no      # Enable RGB_MATRIX (not work yet)
-RGB_MATRIX_DRIVER = ws2812
 
 # Do not enable SLEEP_LED_ENABLE. it uses the same timer as BACKLIGHT_ENABLE
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
@@ -47,3 +48,8 @@ SRC += lib/keyball/keyball.c
 SPACE_CADET_ENABLE = no
 GRAVE_ESC_ENABLE = no
 MAGIC_ENABLE = no
+
+ifeq ($(strip $(MCU)), RP2040)
+    EXTRAINCDIRS += lib/pico-sdk/src/rp2_common/hardware_spi/include
+    SRC += lib/pico-sdk/src/rp2_common/hardware_spi/spi.c
+endif

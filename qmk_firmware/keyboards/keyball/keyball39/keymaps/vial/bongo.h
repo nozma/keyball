@@ -29,6 +29,10 @@ uint8_t pressed_keys_index = 0;
 bool key_down = 0;
 char wpm[42];
 
+#ifdef SPLIT_KEYBOARD
+extern bool bongo_remote_tap_pending;
+#endif
+
 static const char PROGMEM idle[IDLE_FRAMES][ANIM_SIZE] =
 {
     {
@@ -635,6 +639,14 @@ bool detect_key_down(void)
             return true;
         }
     }
+
+#ifdef SPLIT_KEYBOARD
+    if (bongo_remote_tap_pending)
+    {
+        bongo_remote_tap_pending = false;
+        return true;
+    }
+#endif
 
     return false;
 }

@@ -30,6 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef QMK_SETTINGS
 #    include "qmk_settings.h"
 #endif
+#ifdef SPLIT_KEYBOARD
+#    include "split_util.h"
+#    include "transactions.h"
+#endif
 #ifdef VIAL_ENABLE
 #    include "raw_hid.h"
 #    include "quantum/vial.h"
@@ -39,6 +43,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum custom_keycodes {
     USER00 = KEYBALL_SAFE_RANGE,
 };
+
+#ifdef SPLIT_KEYBOARD
+// マスター側で押されたキーをスレーブ側のBongo表示へ伝えるためのフラグ。
+bool bongo_remote_tap_pending = false;
+
+static void rpc_bongo_tap(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
+    (void)initiator2target_buffer_size;
+    (void)initiator2target_buffer;
+    (void)target2initiator_buffer_size;
+    (void)target2initiator_buffer;
+    bongo_remote_tap_pending = true;
+}
+#endif
 
 #ifdef VIA_ENABLE
 // EEPROM 初期化直後に Vial 設定へ反映したい項目がある場合のフラグ
@@ -178,6 +195,12 @@ void keyboard_post_init_user(void) {
         needs_tapping_defaults = false;
     }
 #endif
+
+#ifdef SPLIT_KEYBOARD
+    if (!is_keyboard_master()) {
+        transaction_register_rpc(KEYBALL_SYNC_BONGO, rpc_bongo_tap);
+    }
+#endif
 }
 
 #ifdef OLED_ENABLE
@@ -211,6 +234,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef VIAL_ENABLE
     if (!process_record_vial(keycode, record)) {
         return false;
+    }
+#endif
+
+#ifdef SPLIT_KEYBOARD
+    if (record->event.pressed && is_keyboard_master()) {
+        if (record->event.key.row >= (MATRIX_ROWS / 2)) {
+            transaction_rpc_send(KEYBALL_SYNC_BONGO, 0, NULL);
+        }
     }
 #endif
 

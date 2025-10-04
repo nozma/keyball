@@ -25,6 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef SPLIT_KEYBOARD
 #    include "split_util.h"
 #endif
+#ifdef POINTING_DEVICE_ENABLE
+#    include "drivers/pmw3360/pmw3360.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -53,13 +56,53 @@ void keyball_on_adjust_layout(keyball_adjust_t v) {
 
 #ifdef SPLIT_KEYBOARD
 bool is_keyboard_master_impl(void);
-bool is_keyboard_master(void);
 
+static bool keyball39_is_left       = true;
+static bool keyball39_hand_detected = false;
+
+// Keyball39 はトラックボール搭載側で左右を判定する想定。
+// 標準では右手側にトラックボールを置くため、左手搭載時は KEYBALL39_TRACKBALL_ON_LEFT を有効にする。
+static void keyball39_detect_hand(void) {
+    if (keyball39_hand_detected) {
+        return;
+    }
+#    ifdef POINTING_DEVICE_ENABLE
+    bool has_ball = keyball.this_have_ball;
+    if (!has_ball) {
+        has_ball               = pmw3360_init();
+        keyball.this_have_ball = has_ball;
+    }
+#        ifdef KEYBALL39_TRACKBALL_ON_LEFT
+    keyball39_is_left = has_ball;
+#        else
+    keyball39_is_left = !has_ball; // 既定ではトラックボール搭載側を右手とみなす。左手搭載の場合は config.h で KEYBALL39_TRACKBALL_ON_LEFT を定義する。
+#        endif
+#    else
+    keyball39_is_left = !is_keyboard_master_impl();
+#    endif
+    keyball39_hand_detected = true;
+}
+#endif
+
+void keyboard_pre_init_kb(void) {
+#ifdef POINTING_DEVICE_ENABLE
+    keyball.this_have_ball = pmw3360_init();
+#endif
+#ifdef SPLIT_KEYBOARD
+    keyball39_hand_detected = false;
+    keyball39_detect_hand();
+#endif
+    keyboard_pre_init_user();
+}
+
+#ifdef SPLIT_KEYBOARD
 bool is_keyboard_left_impl(void) {
-    return !is_keyboard_master_impl();
+    keyball39_detect_hand();
+    return keyball39_is_left;
 }
 
 bool is_keyboard_left(void) {
-    return !is_keyboard_master();
+    keyball39_detect_hand();
+    return keyball39_is_left;
 }
 #endif

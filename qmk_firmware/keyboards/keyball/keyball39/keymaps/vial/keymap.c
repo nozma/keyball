@@ -40,10 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 
-enum custom_keycodes {
-    USER00 = KEYBALL_SAFE_RANGE,
-};
-
 #ifdef SPLIT_KEYBOARD
 // マスター側で押されたキーをスレーブ側のBongo表示へ伝えるためのフラグ。
 bool bongo_remote_tap_pending = false;
@@ -73,14 +69,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                            KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     ,
     LT(3,KC_A), KC_S    , KC_D     , KC_F     , KC_G     ,                            KC_H     , KC_J     , KC_K     , LT(4,KC_L), LT(4,KC_SCLN),
     LSFT_T(KC_Z), KC_X  , KC_C     , KC_V     , KC_B     ,                            KC_N     , KC_M     , KC_COMMA , KC_DOT   , RSFT_T(KC_SLSH),
-    KC_TAB   , KC_LCTL  , QK_MACRO_0, KC_LALT , LT(1,KC_LNG2), LT(5,KC_ENTER),   LT(6,KC_SPACE), LT(2,KC_LNG1), RCTL_T(KC_LNG2), RALT_T(KC_INT1), KC_NUHS , KC_RBRC
+    KC_LGUI  , KC_F12   , KC_NO    , KC_LALT , LT(1,KC_LNG2), LT(5,KC_ENTER),   LT(6,KC_SPACE), LT(2,KC_LNG1), RCTL_T(KC_LNG2), RALT_T(KC_INT1), KC_NUHS , QK_MACRO_0
   ),
 
   [1] = LAYOUT_universal(
     KC_ESC   , LGUI(KC_W), LGUI(KC_E), LGUI(KC_R), LGUI(KC_T),                   S(KC_6)  , S(KC_7)  , S(KC_8)  , S(KC_9)  , KC_MINS ,
     LGUI(KC_A), LGUI(KC_S), LGUI(KC_D), LGUI(KC_F), LGUI(KC_G),                  LGUI(KC_H), LGUI(KC_J), LGUI(KC_K), LGUI(KC_L), KC_EQUAL,
     LGUI(KC_Z), LGUI(KC_X), LGUI(KC_C), LGUI(KC_V), LGUI(KC_B),                  LGUI(KC_N), LGUI(KC_M), LGUI(KC_COMMA), LGUI(KC_DOT), RSFT_T(KC_INT3),
-    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , LGUI(KC_ENTER), KC_TRNS,    LGUI(KC_SPACE), KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , LGUI(KC_ENTER),    LGUI(KC_SPACE), KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
 
   [2] = LAYOUT_universal(
@@ -94,25 +90,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     LCTL(KC_Q), LCTL(KC_W), LGUI(KC_RIGHT), LCTL(KC_R), LCTL(KC_T),                 LCTL(KC_Y), LCTL(KC_U), LCTL(KC_I), LCTL(KC_O), KC_UP    ,
     KC_NO    , LCTL(KC_A), KC_DELETE   , KC_RGHT  , LCTL(KC_F),                     KC_BSPC  , LCTL(KC_J), LCTL(KC_K), LCTL(KC_L), LCTL(KC_SCLN),
     LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C) , LCTL(KC_V), KC_LEFT ,                      KC_DOWN  , LCTL(KC_M), LCTL(KC_COMMA), LCTL(KC_DOT), LCTL(KC_SLSH),
-    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , LCTL(KC_ENT), KC_TRNS,   LCTL(KC_SPC), KC_TRNS , KC_TRNS , USER00 , KC_TRNS , KC_TRNS
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , LGUI(KC_ENTER),   LCTL(KC_SPACE), KC_TRNS , KC_TRNS , KBC_RST , KC_TRNS , KC_TRNS
   ),
 
   [4] = LAYOUT_universal(
-    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             LCTL(KC_NUHS), LCTL(G(KC_I)), 0x00C1 , S(KC_L) , KC_TRNS ,
-    KC_TRNS , KC_LCTL , KC_TRNS , KC_TRNS , KC_TRNS ,                             S(KC_H) , KC_BTN1 , KC_BTN2 , KC_TRNS , KC_TRNS ,
-    KC_TRNS , KC_LSFT , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,
-    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS,     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
+    RGB_TOG , RGB_MOD , RGB_HUI , RGB_SAI , RGB_VAI ,                             LCTL(KC_NUHS), LCTL(LGUI(KC_I)), 0x00C1 , S(KC_L) , KC_TRNS ,
+    KC_LCTL , RGB_RMOD, RGB_HUD , RGB_SAD , RGB_VAD ,                             S(KC_H) , KC_BTN1 , KC_BTN2 , KC_TRNS , KC_TRNS ,
+    KC_LSFT , CPI_I100, KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,
+    KC_TRNS , CPI_D100, KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS,     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
 
   [5] = LAYOUT_universal(
-    KC_ESC  , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , S(KC_RBRC) , KC_RBRC ,
-    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , S(KC_NUHS) , KC_NUHS ,
+    KC_ESC  , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , S(KC_RBRC), KC_RBRC ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , S(KC_NUHS), KC_NUHS ,
     KC_TRNS , KC_LSFT , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , S(KC_INT3),
     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS,     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS
   ),
 
   [6] = LAYOUT_universal(
-    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , S(KC_LBRC) , KC_LBRC ,
+    KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , S(KC_LBRC), KC_LBRC ,
     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , S(KC_QUOT),
     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS ,                             KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_INT1 ,
     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS,     KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS , KC_TRNS

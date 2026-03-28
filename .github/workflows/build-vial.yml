@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - vial-layout-update
+      - workflow-artifact-fix
   pull_request:
     paths:
       - 'qmk_firmware/keyboards/keyball/keyball44/**'
@@ -14,37 +14,64 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      QMK_HOME: ${{ github.workspace }}/.qmk_work
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Prepare build tree
+      - name: Install build toolchain and QMK CLI
         run: |
-          git clone --depth=1 https://github.com/qmk/qmk_firmware.git .qmk_work
-          rsync -a qmk_firmware/keyboards/keyball/ .qmk_work/keyboards/keyball/
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+          python3 -m pip install --user --upgrade pip qmk
+          echo "$(python3 -m site --user-base)/bin" >> $GITHUB_PATH
+          export PATH="$(python3 -m site --user-base)/bin:$PATH"
+          qmk --version
 
-      - name: Install QMK CLI and dependencies
+      - name: Setup QMK workspace
         run: |
-          cd .qmk_work
-          python -m pip install --upgrade pip
-          python -m pip install qmk
-          python -m pip install -r requirements.txt
+          qmk setup -H "$QMK_HOME" --branch master --yes
+          python3 -m pip install --user -r "$QMK_HOME/requirements.txt"
+
+      - name: Overlay Keyball sources
+        run: |
+          QMK_ROOT="$QMK_HOME"
+          if [ -d "$QMK_ROOT/qmk_firmware" ]; then
+            QMK_ROOT="$QMK_ROOT/qmk_firmware"
+          fi
+          mkdir -p "$QMK_ROOT/keyboards/keyball"
+          rsync -a qmk_firmware/keyboards/keyball/ "$QMK_ROOT/keyboards/keyball/"
+          mkdir -p "$QMK_ROOT/drivers"
+          rsync -a qmk_firmware/drivers/ "$QMK_ROOT/drivers/"
 
       - name: Build Keyball44 Vial firmware
         run: |
-          cd .qmk_work
-          make keyball/keyball44:vial
+          QMK_ROOT="$QMK_HOME"
+          if [ -d "$QMK_ROOT/qmk_firmware" ]; then
+            QMK_ROOT="$QMK_ROOT/qmk_firmware"
+          fi
+          make -C "$QMK_ROOT" SKIP_GIT=yes keyball/keyball44:vial
+
+      - name: Locate firmware artifact
+        id: locate
+        run: |
+          QMK_ROOT="$QMK_HOME"
+          if [ -d "$QMK_ROOT/qmk_firmware" ]; then
+            QMK_ROOT="$QMK_ROOT/qmk_firmware"
+          fi
+          UF2_PATH=$(find "$QMK_ROOT" -maxdepth 6 -type f -name 'keyball_keyball44_vial.uf2' -print -quit)
+          if [ -z "$UF2_PATH" ]; then
+            echo "Failed to locate UF2 artifact" >&2
+            find "$QMK_ROOT" -maxdepth 6 -type f -name '*.uf2' -print
+            exit 1
+          fi
+          echo "UF2_PATH=$UF2_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
           name: keyball44-vial-uf2
-          path: .qmk_work/.build/keyball_keyball44_vial.uf2
+          path: ${{ steps.locate.outputs.UF2_PATH }}
+          if-no-files-found: error
